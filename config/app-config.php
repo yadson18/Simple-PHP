@@ -1,11 +1,10 @@
 <?php 
 	use Simple\Configurator\Configurator;
 
-	Configurator::getInstance()
+	$configurator = Configurator::getInstance();
 
+	$configurator
 		->setConfig("AppName", "Example Name - ")
-
-		->setConfig("Salt", "759403333bb1ee9a773e97f4d1d1b29baab207b5")
 		
 		->setConfig("DisplayErrors", true)
 
