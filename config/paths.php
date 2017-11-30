@@ -1,7 +1,5 @@
 <?php
-	if (!defined('DS')) {
-	    define('DS', DIRECTORY_SEPARATOR);
-	}
+	define('DS', DIRECTORY_SEPARATOR);
 
 	define('ROOT', dirname(__DIR__));
 
@@ -9,9 +7,17 @@
 
 	define('APP', ROOT . DS . APP_DIR . DS);
 
+	define('CONTROLLER', APP . DS . 'Controller' . DS);
+
+	define('MODEL', APP . DS . 'Model' . DS);
+
+	define('VIEW', APP . DS . 'View' . DS);
+
 	define('CONFIG', ROOT . DS . 'config' . DS);
 
-	define('SIMPLE_PATH', ROOT . DS . 'vendor' . DS . 'Simple' . DS);
+	define('VENDOR', ROOT . DS . 'vendor' . DS);
+
+	define('SIMPLE_PATH', VENDOR . 'Simple' . DS);
 
 	define('SIMPLE', SIMPLE_PATH . 'src' . DS);
 

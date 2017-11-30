@@ -1,7 +1,7 @@
 <?php 
 	abstract class Autoload
 	{	
-		public static function loadNameSpaces()
+		public static function loadNamespaces()
 		{
             spl_autoload_register( function($namespace) {
             	self::fromVendorDir($namespace);
