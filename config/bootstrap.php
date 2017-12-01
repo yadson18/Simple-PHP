@@ -11,41 +11,29 @@
 	    trigger_error('You must enable the mbstring extension.', E_USER_ERROR);
 	}
 
-	require_once 'paths.php';
-
-	require_once VENDOR . 'Autoload.php';
-
-	Autoload::loadNamespaces();
-
+	require_once SIMPLE . 'internal-functions.php';
 	require_once CONFIG . 'app-config.php';
 
+	$config->mbInternalEncoding($config->use('App.encoding'));
 
-	use Simple\Http\Server;
+	$config->dateDefaultTimezone($config->use('App.timezone'));
 
-	if ($configurator->getConfig("DefaultErrorPage")) {
-		Server::setConfig($configurator->getConfig("DefaultErrorPage"));
-	}
+	$config->defaultLocale($config->use('App.locate'));
 
-	if ($configurator->getConfig("EmailTransport")) {
-		Email::setConfig($configurator->getConfig("EmailTransport"));
-	}
+	$config->displayErrors($config->use('App.displayErrors'));
 
-	if ($configurator->getConfig("DefaultRoute")) {
-		Router::setConfig($configurator->getConfig("DefaultRoute"));
-	}
 
-	if ($configurator->getConfig("Databases")) {
-		Connection::setConfig($configurator->getConfig("Databases"));
-	}
+	use Simple\Application\Application;
+	/*use Simple\Database\Database;
+	use Simple\Error\ErrorHandler;
+	use Simple\Mailer\Email;*/
+	use Simple\Routing\Router;
+	/*use Simple\Http\Integrator\Webservice;*/
 
-	if ($configurator->getConfig("Webservice")) {
-		Webservice::setConfig($configurator->getConfig("Webservice"));
-	}
-
-	if ($configurator->getConfig("AppName")) {
-		Application::setConfig($configurator->getConfig("AppName"));
-	}
-
-	if ($configurator->getConfig("DisplayErrors")) {
-		ErrorHandler::setConfig($configurator->getConfig("DisplayErrors"));
-	}
+	Application::configErrorPage($config->use('App.errorPage'));
+	Application::configAppName($config->use('App.name'));
+	/*Database::configDatabase($config->use('Databases'));
+	ErrorHandler::configDisplayError($config->use('App.displayErrors'));
+	Email::configEmail($config->use('Email.default'));*/
+	Router::configRoute($config->use('Route.default'));
+	/*Webservice::configConnection($config->use('Webservice'));*/

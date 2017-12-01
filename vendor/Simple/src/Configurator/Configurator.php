@@ -1,7 +1,7 @@
 <?php 
 	namespace Simple\Configurator;
 
-	class Configurator
+	class Configurator extends PhpConfig
 	{
 		private static $Instance;
 
@@ -17,7 +17,7 @@
 			return self::$Instance;
 		}
 
-		public function setConfig(string $configName, $config)
+		public function set(string $configName, $config)
 		{
 			if (!empty($configName) && !is_numeric($configName)) {
 				if (is_bool($config) || !empty($config)) {
@@ -29,11 +29,8 @@
 			return false;
 		}
 
-		public function getConfig(string $configName)
+		public function use(string $configName)
 		{
-			if (isset($this->appConfigs[$configName])) {
-				return $this->appConfigs[$configName];
-			}
-			return false;
+			return find_array_values($configName, $this->appConfigs);
 		}
 	}

@@ -1,19 +1,30 @@
 <?php 
 	namespace Simple\Http;
 
+	use Simple\Application\Application;
+	use Simple\Configurator\Configurator;
+
 	class Server
 	{
-		private static $configs;
-
 		private $app;
 
 		public function __construct(Application $app)
 		{
+			$this->setApp($app);
+		}
+
+		public function run()
+		{
+			$this->getApp()->bootstrap()->start(new Request());
+		}
+
+		public function setApp(Application $app)
+		{
 			$this->app = $app;
 		}
 
-		public static function setConfig(string $config)
+		public function getApp()
 		{
-			static::$configs = $config;
+			return $this->app;
 		}
 	}

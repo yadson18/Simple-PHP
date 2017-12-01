@@ -7,11 +7,11 @@
 
 	define('APP', ROOT . DS . APP_DIR . DS);
 
-	define('CONTROLLER', APP . DS . 'Controller' . DS);
+	define('CONTROLLER', APP . 'Controller' . DS);
 
-	define('MODEL', APP . DS . 'Model' . DS);
+	define('MODEL', APP . 'Model' . DS);
 
-	define('VIEW', APP . DS . 'View' . DS);
+	define('VIEW', APP . 'View' . DS);
 
 	define('CONFIG', ROOT . DS . 'config' . DS);
 
