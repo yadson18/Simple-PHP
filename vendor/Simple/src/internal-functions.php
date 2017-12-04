@@ -17,3 +17,10 @@
 	{
 		return array_deep_search(explode('.', $keys), $array);
 	}
+
+	function debug($data)
+	{
+		echo "<pre>";
+		var_dump($data);
+		echo "</pre>";
+	}

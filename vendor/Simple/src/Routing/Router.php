@@ -9,7 +9,7 @@
 
 		private $controller;
 
-		private $view;
+		private $view = 'index';
 
 		public function __construct(string $controller, string $view)
 		{
@@ -72,10 +72,7 @@
 					$this->setView(static::getDefaultView());
 				}
 				else {
-					if (empty($route['view'])) {
-						$this->setView('index');
-					}
-					else {
+					if (!empty($route['view'])) {
 						$this->setView($route['view']);
 					}
 					

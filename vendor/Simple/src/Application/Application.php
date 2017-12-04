@@ -9,9 +9,9 @@
 		
 		private static $errorPage;
 		
-		private static $namespace = 'App\\Controller\\';
-		
 		private $bootstrapPath;
+
+		private $bootstrapIsLoaded = false; 
 
 		public function __construct(string $bootstrapPath)
 		{
@@ -20,28 +20,36 @@
 
 		public function start(Request $request)
 		{
-			$controller = $request->getRoute()->getController();
-			$view = $request->getRoute()->getView();
-			
-			$controllerInstance = $this->getControllerInstance($controller);
-		}
+			if ($request->statusCodeIs(200)) {
+				$header = $request->getHeader();
+				$controller = $header->request->controller;
+				$view = $header->request->url->view;
 
-		protected function getControllerInstance(string $controller)
-		{
-			$controller = static::$namespace . $controller . 'Controller';
-
-			if (class_exists($controller)) {
-				return new $controller();
+				if (class_exists($controller) && is_file($header->request->page)) {
+					debug($header);
+				}
 			}
-		} 
+		}
 
 		public function bootstrap()
 		{
-			if (file_exists($this->getBootstrapPath() . '/bootstrap.php')) {
-				include $this->getBootstrapPath() . '/bootstrap.php';
+			if (file_exists($this->getBootstrapPath() . 'bootstrap.php')) {
+				$this->bootstrapIsLoaded();
+
+				include $this->getBootstrapPath() . 'bootstrap.php';
 			}
 
 			return $this;
+		}
+
+		protected function bootstrapIsLoaded()
+		{
+			$this->bootstrapIsLoaded = true;
+		}
+
+		public function bootstrapFileStatus()
+		{
+			return $this->bootstrapIsLoaded;
 		}
 
 		protected function setBootstrapPath(string $bootstrapPath)
@@ -49,7 +57,7 @@
 			$this->bootstrapPath = $bootstrapPath;
 		}
 
-		public function getBootstrapPath()
+		protected function getBootstrapPath()
 		{
 			return $this->bootstrapPath;
 		}

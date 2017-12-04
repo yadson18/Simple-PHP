@@ -2,30 +2,56 @@
 	namespace Simple\Http;
 
 	use Simple\Application\Application;
-	use Simple\Configurator\Configurator;
 
 	class Server
 	{
 		private $app;
+
+		private $request;
 
 		public function __construct(Application $app)
 		{
 			$this->setApp($app);
 		}
 
-		public function run()
+		public function run(bool $serverStatus)
 		{
-			$this->getApp()->bootstrap()
-				->start(new Request($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']));
+			if ($serverStatus) {
+				$this->getApp()->start($this->getRequest());
+			}
 		}
 
-		public function setApp(Application $app)
+		public function listening()
+		{
+			$this->getApp()->bootstrap();
+			
+			if ($this->getApp()->bootstrapFileStatus()) {
+				$this->makeRequest(new Request($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']));
+
+				return true;
+			}
+			return false;
+		}
+
+		protected function setApp(Application $app)
 		{
 			$this->app = $app;
+
+			return $this;
 		}
 
-		public function getApp()
+		protected function getApp()
 		{
 			return $this->app;
+		}
+
+		protected function getRequest()
+		{
+			return $this->request;
+		}
+
+		protected function makeRequest(Request $request)
+		{
+			$this->request = $request;
 		}
 	}

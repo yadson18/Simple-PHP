@@ -16,7 +16,7 @@
 
 		->set('Route', [
 			'default' => [
-				"controller" => "Simple", 
+				"controller" => "Page", 
 				"view" => "home"
 			]
 		])

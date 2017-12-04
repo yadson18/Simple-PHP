@@ -11,10 +11,4 @@
 
 	$server = new Server(new Application(CONFIG));
 
-	$server->run();
-
-
-	//var_dump(parse_url(urldecode($_SERVER['REQUEST_URI']))); echo "<br>";
-	//var_dump(urldecode($_SERVER['REQUEST_URI'])); echo "<br>";
-
-	//var_dump(parse_url(urldecode($_SERVER['REQUEST_URI'])));
+	$server->run($server->listening());
