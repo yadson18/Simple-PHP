@@ -1,5 +1,5 @@
 <?php 
-	if (version_compare(PHP_VERSION, '5.6.0') < 0) {
+/*	if (version_compare(PHP_VERSION, '5.6.0') < 0) {
 	    trigger_error('PHP version must be equal or higher than 5.6.0.', E_USER_ERROR);
 	}
 	
@@ -9,7 +9,7 @@
 	
 	if (!extension_loaded('mbstring')) {
 	    trigger_error('You must enable the mbstring extension.', E_USER_ERROR);
-	}
+	}*/
 
 	require_once SIMPLE . 'internal-functions.php';
 	require_once CONFIG . 'app-config.php';

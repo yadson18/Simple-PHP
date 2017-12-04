@@ -7,80 +7,53 @@
 	{
 		private $router;
 
-		private $requestMethod;
+		private $requestType;
 
-		private $controller;
+		private $requestArgs;
 
-		private $controllerMethod;
-
-		private $methodArgs;
-
-		public function __construct()
+		public function __construct(string $urlRequest, string $requestType)
 		{
-			$this->router = new Router();
-			$this->convertUrl($_SERVER['REQUEST_URI']);
-			$this->setRequestMethod($_SERVER['REQUEST_METHOD']);
+			$this->splitUrl($urlRequest);
+			$this->setRequestType($requestType);		
 		}
 
-		protected function convertUrl(string $url)
+		protected function splitUrl(string $url)
 		{
-			$methodArgs = explode("/", substr($url, 1));
-			$controller = array_shift($methodArgs);
-			$controllerMethod = array_shift($methodArgs);
+			$requestArgs = explode("/", substr($url, 1));
+			$controller = (string) array_shift($requestArgs);
+			$view = (string) array_shift($requestArgs);
 
-            $this->setControllerMethod($controllerMethod);
-            $this->setController($controller);
-            $this->setMethodArgs($methodArgs);
+			$this->setRoute(new Router($controller, $view));
+            $this->setRequestArgs($requestArgs);
 		}
 
-		protected function setRequestMethod(string $requestMethod)
+		protected function setRequestType(string $requestType)
 		{
-			$this->requestMethod = $requestMethod;
+			$this->requestType = $requestType;
 		}
 
-		public function getRequestMethod()
+		public function getRequestType()
 		{
-			return $this->requestMethod;
+			return $this->requestType;
 		}
 
-		protected function setController(string $controller = null)
+		protected function setRequestArgs(array $requestArgs)
 		{
-			if (!empty($controller)) {
-				$this->controller = ucfirst($controller);
-			}
-			else {
-				$this->controller = ucfirst(Router::getDefaultRoute('controller'));
-				$this->setControllerMethod(Router::getDefaultRoute('view'));
-			}
+			$this->requestArgs = $requestArgs;
 		}
 
-		public function getController()
+		public function getRequestArgs()
 		{
-			return $this->controller;
+			return $this->requestArgs;
 		}
 
-		protected function setControllerMethod(string $controllerMethod = null)
+		protected function setRoute(Router $router)
 		{
-			if (!empty($controllerMethod)) {
-				$this->controllerMethod = $controllerMethod;
-			}
-			else {
-				$this->controllerMethod = 'index';
-			}
+			$this->router = $router;
 		}
 
-		public function getControllerMethod()
+		public function getRoute()
 		{
-			return $this->controllerMethod;
-		}
-
-		protected function setMethodArgs(array $methodArgs)
-		{
-			$this->methodArgs = $methodArgs;
-		}
-
-		public function getMethodArgs()
-		{
-			return $this->methodArgs;
+			return $this->router;
 		}
 	}

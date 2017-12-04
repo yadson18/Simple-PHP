@@ -5,11 +5,13 @@
 
 	class Application
 	{
-		private $bootstrapPath;
-
 		private static $appName;
-
+		
 		private static $errorPage;
+		
+		private static $namespace = 'App\\Controller\\';
+		
+		private $bootstrapPath;
 
 		public function __construct(string $bootstrapPath)
 		{
@@ -18,13 +20,25 @@
 
 		public function start(Request $request)
 		{
-
+			$controller = $request->getRoute()->getController();
+			$view = $request->getRoute()->getView();
+			
+			$controllerInstance = $this->getControllerInstance($controller);
 		}
+
+		protected function getControllerInstance(string $controller)
+		{
+			$controller = static::$namespace . $controller . 'Controller';
+
+			if (class_exists($controller)) {
+				return new $controller();
+			}
+		} 
 
 		public function bootstrap()
 		{
-			if (file_exists($this->bootstrapPath . '/bootstrap.php')) {
-				include $this->bootstrapPath . '/bootstrap.php';
+			if (file_exists($this->getBootstrapPath() . '/bootstrap.php')) {
+				include $this->getBootstrapPath() . '/bootstrap.php';
 			}
 
 			return $this;

@@ -11,6 +11,11 @@
 
 		private $view;
 
+		public function __construct(string $controller, string $view)
+		{
+			$this->setRoute(['controller' => $controller, 'view' => $view]);
+		}
+
 		public static function configRoute(array $defaultRoute)
 		{
 			if (isset($defaultRoute['controller']) && isset($defaultRoute['view'])) {
@@ -77,16 +82,5 @@
 					$this->setController($route['controller']);
 				}
 			}
-		}
-
-		public static function getDefaultRoute(string $indexName = null)
-		{	
-			if (!empty($indexName)) {
-				if (isset(static::$defaultRoute[$indexName])) {
-					return static::$defaultRoute[$indexName];
-				}
-				return false;
-			}
-			return static::$defaultRoute;
 		}
 	}

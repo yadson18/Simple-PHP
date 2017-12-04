@@ -15,7 +15,8 @@
 
 		public function run()
 		{
-			$this->getApp()->bootstrap()->start(new Request());
+			$this->getApp()->bootstrap()
+				->start(new Request($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']));
 		}
 
 		public function setApp(Application $app)
