@@ -16,18 +16,18 @@ Configurações para uso.
 	
 	Modifique o arquivo "apache.conf".
 		De:
-			&lt;Directory /var/www/&gt;
+			<Directory /var/www/>
 				Options Indexes FollowSymLinks
 				AllowOverride None
 				Require all danied
-			&lt;/Directory&gt;	
+			</Directory>	
 					</div>
 		Para:
-			&lt;Directory /var/www/&gt;
+			<Directory /var/www/>
 				Options Indexes FollowSymLinks
 				AllowOverride All
 				Require all granted
-			&lt;/Directory&gt;	
+			</Directory>	
 
 	Instale o "php-interbase", caso for usar o "firebird".
 		# apt-get install php-interbase
