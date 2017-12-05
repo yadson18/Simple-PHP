@@ -1,41 +1,97 @@
-Configurações para uso.
+<article class="padding">
+	<h1>Simple Framework</h1>
+	<h3>Configurações para uso.</h3>
+	<ol>
+		<li>
+			Instale o PHP.
+			<ol class="prompt padding">
+				<li># add-apt-repository ppa:ondrej/php</li>
+				<li># apt-get update</li>
+				<li># apt-get install -y php</li>
+			</ol>
+		</li>
+		<li>
+			Instale o Apache.
+			<ol class="prompt padding">
+				<li># apt-get install apache2.</li>
+			</ol>
+		</li>
+		<li>Instale um SGBD de sua preferência.</li>
+		<li>Defina o diretório "webroot" como raíz do projeto nas configurações do Apache.</li>
+		<li>
+			Habilite o módulo do Apache para reescrita de URL's.
+			<ol class="prompt padding">
+				<li># a2enmod rewrite</li>
+			</ol>
+		</li>
+		<li>
+			Modifique o arquivo "apache.conf".
+			<ol class="file padding">
+				<li>
+					<p>De:<p>
+					<div class="file-content">
+						<p>&lt;Directory /var/www/&gt;</p>
+						<p class="ident">Options Indexes FollowSymLinks</p>
+						<p class="ident">AllowOverride None</p>
+						<p class="ident">Require all danied</p>
+						<p>&lt;/Directory&gt;</p>	
+					</div>
+				</li>
+				<li>
+					<p>Para:<p>
+					<div class="file-content">
+						<p>&lt;Directory /var/www/&gt;</p>
+						<p class="ident">Options Indexes FollowSymLinks</p>
+						<p class="ident">AllowOverride All</p>
+						<p class="ident">Require all granted</p>
+						<p>&lt;/Directory&gt;</p>	
+					</div>
+				</li>
+			</ol>
+		</li>
+		<li>
+			Instale o "php-interbase", caso for usar o "firebird".
+			<ol class="prompt padding">
+				<li># apt-get install php-interbase</li>
+			</ol>
+		</li>
+		<li>
+			Instale o "php-soap", caso seja necessário o uso de webservices.
+			<ol class="prompt padding">
+				<li># apt-get install php-soap</li>
+			</ol>
+		</li>
+		<li>
+			Por fim, reinicie o Apache, para carregar as novas configurações.
+			<ol class="prompt padding">
+				<li># service apache2 restart</li>
+			</ol>
+		</li>
+	</ol>
+</article>	
+<style type="text/css">
+	h1{ text-align: center; }
 
-1 - Instale o PHP.
-	# add-apt-repository ppa:ondrej/php
-	# apt-get update
-	# apt-get install -y php
+	ol li{ margin-bottom: 25px }
 
-2 - Instale o Apache.
-	# apt-get install apache2
+	.padding{ padding: 20px; }
 
-3 - Instale um SGBD de sua preferência.
+	.file-content .ident{ text-indent: 4em; }
 
-4 - Defina o diretório "webroot" como raíz do projeto nas configurações do Apache.
+	.file-content p{ margin: 0; text-indent: 2em; }
 
-5 - Habilite o módulo do Apache para reescrita de URL's.
-	# a2enmod rewrite
+	.prompt{ background-color: black; color: #5f0; }
 
-6 - Modifique o arquivo "apache.conf".
+	article{
+		color: black; 
+		font-family: sans-serif; 
+		font-size: 1.1em;
+	}
 	
-	De:
-		<Directory /var/www/>
-			Options Indexes FollowSymLinks
-			AllowOverride None
-			Require all danied
-		</Directory>
-
-	Para:
-		<Directory /var/www/>
-			Options Indexes FollowSymLinks
-			AllowOverride All
-			Require all granted
-		</Directory>
-
-7 - Instale o "php-interbase", caso for usar o "firebird".
-	# apt-get install php-interaase
-
-8 - Instale o "php-soap", caso seja necessário o uso de webservices.
-	# apt-get install php-soap
-
-9 - Por fim, reinicie o Apache, para carregar as novas configurações.
-	# service apache2 restart
+	.prompt, .file{
+		list-style: none;
+		margin-top: 10px;
+		width: 50%; 
+		box-shadow: 1px 1px 8px 0 gray;
+	}
+</style>		

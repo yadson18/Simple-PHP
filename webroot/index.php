@@ -1,4 +1,4 @@
-<?php 
+ <?php 
 	require_once dirname(__DIR__) . '/config/paths.php';
 
 	require_once VENDOR . 'Autoload.php';
@@ -12,3 +12,4 @@
 	$server = new Server(new Application(CONFIG));
 
 	$server->run($server->listening());
+
