@@ -1,4 +1,4 @@
-<article class="padding">
+<article class="padding" style="background-color: red">
 	<h1>Simple Framework</h1>
 	<h3>Configurações para uso.</h3>
 	<ol>
