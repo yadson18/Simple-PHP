@@ -1,4 +1,4 @@
-<article class="padding" style="background-color: red">
+<article class="padding">
 	<h1>Simple Framework</h1>
 	<h3>Configurações para uso.</h3>
 	<ol>
@@ -30,21 +30,21 @@
 				<li>
 					<p>De:<p>
 					<div class="file-content">
-						<p>&lt;Directory /var/www/&gt;</p>
-						<p class="ident">Options Indexes FollowSymLinks</p>
-						<p class="ident">AllowOverride None</p>
-						<p class="ident">Require all danied</p>
-						<p>&lt;/Directory&gt;</p>	
+						&lt;Directory /var/www/&gt;
+						&nbsp;&nbsp;&nbsp;&nbsp;Options Indexes FollowSymLinks<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;AllowOverride None<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;Require all danied<br>
+						&lt;/Directory&gt;	
 					</div>
 				</li>
 				<li>
 					<p>Para:<p>
 					<div class="file-content">
-						<p>&lt;Directory /var/www/&gt;</p>
-						<p class="ident">Options Indexes FollowSymLinks</p>
-						<p class="ident">AllowOverride All</p>
-						<p class="ident">Require all granted</p>
-						<p>&lt;/Directory&gt;</p>	
+						&lt;Directory /var/www/&gt;
+						&nbsp;&nbsp;&nbsp;&nbsp;Options Indexes FollowSymLinks<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;AllowOverride All<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;Require all granted<br>
+						&lt;/Directory&gt;	
 					</div>
 				</li>
 			</ol>
@@ -69,29 +69,3 @@
 		</li>
 	</ol>
 </article>	
-<style type="text/css">
-	h1{ text-align: center; }
-
-	ol li{ margin-bottom: 25px }
-
-	.padding{ padding: 20px; }
-
-	.file-content .ident{ text-indent: 4em; }
-
-	.file-content p{ margin: 0; text-indent: 2em; }
-
-	.prompt{ background-color: black; color: #5f0; }
-
-	article{
-		color: black; 
-		font-family: sans-serif; 
-		font-size: 1.1em;
-	}
-	
-	.prompt, .file{
-		list-style: none;
-		margin-top: 10px;
-		width: 50%; 
-		box-shadow: 1px 1px 8px 0 gray;
-	}
-</style>		
