@@ -18,17 +18,45 @@
 			$this->setBootstrapPath($bootstrapPath);
 		}
 
+		public function fetchAll()
+		{
+
+		}
+
 		public function start(Request $request)
 		{
-			if ($request->statusCodeIs(200)) {
-				$header = $request->getHeader();
-				$controller = $header->request->controller;
+			debug($request->getResponse());
+			/*$controller = $header->request->controller;
 				$view = $header->request->url->view;
 
-				if (class_exists($controller) && is_file($header->request->page)) {
-					debug($header);
+				if (class_exists($controller)) {
+					return $this->makeRequest($header, new $controller, $view);
 				}
-			}
+			include $request->getResponse();
+			if (is_callable([$controller, 'isAuthorized']) &&
+				is_callable([$controller, 'initialize'])
+			) {
+				if ($controller->isAuthorized($view)) {
+					$controller->initialize($this); 
+					$result = $controller->$view($header->request->args);
+
+					if ($controller->Ajax->notEmptyResponse()) {
+						echo $controller->Ajax->getResponse();
+
+						exit();
+					}
+					else if(is_file($header->request->page)) {
+						ob_start();
+
+						$this->Html = $controller->Html;
+						$this->Ajax = $controller->Ajax;
+
+						include static::$defaultTemplate;
+
+						return ob_get_clean();
+					}
+				}
+			}*/
 		}
 
 		public function bootstrap()

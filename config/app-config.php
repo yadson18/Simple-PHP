@@ -11,7 +11,7 @@
 			'encoding' => 'utf-8',
 			'timezone' => 'UTC',
 			'locate' => 'pt-Br',
-			'errorPage' => VIEW . 'ErrorPages' . DS . 'daniedAccess.php'
+			'errorPage' => TEMPLATE . 'ErrorPages' . DS . 'daniedAccess.php'
 		])
 
 		->set('Route', [

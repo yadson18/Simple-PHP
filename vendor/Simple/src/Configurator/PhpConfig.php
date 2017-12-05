@@ -5,7 +5,9 @@
 	{
 		protected function useFunction(string $functionName, array $value)
 		{
-			return call_user_func_array($functionName, $value);
+			if (function_exists($functionName)) {
+				return call_user_func_array($functionName, $value);
+			}
 		}
 
 		public function mbInternalEncoding(string $encode)

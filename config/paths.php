@@ -11,7 +11,7 @@
 
 	define('MODEL', APP . 'Model' . DS);
 
-	define('VIEW', APP . 'View' . DS);
+	define('TEMPLATE', APP . 'Template' . DS);
 
 	define('CONFIG', ROOT . DS . 'config' . DS);
 

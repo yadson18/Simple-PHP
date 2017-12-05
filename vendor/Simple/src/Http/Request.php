@@ -1,8 +1,9 @@
 <?php 
 	namespace Simple\Http;
 
-	use \stdClass;
+	use Simple\Controller\Interfaces\ControllerInterface;
 	use Simple\Routing\Router;
+	use \stdClass;
 
 	class Request
 	{
@@ -18,7 +19,7 @@
 
 		public function __construct(string $urlRequest, string $requestType)
 		{
-			$this->setHeader($urlRequest, $requestType)->makeRequest();
+			$this->setHeader($urlRequest, $requestType);
 		}
 
 		protected function setHeader(string $urlRequest, string $requestType)
@@ -40,19 +41,29 @@
 			return $this;
 		}
 
-		public function getHeader()
+		public function getResponse()
+		{
+			if ($this->statusCodeIs(200)) {
+				return $this->getHeader();
+			}
+			return false;
+		}
+
+		protected function getHeader()
 		{
 			$controller = $this->getRoute()->getController();
 			$view = $this->getRoute()->getView();
 			
 			return (object) [
 				'request' => (object) [
+					'status' => $this->getStatusCode(),
 					'type' => $this->getRequestType(),
 					'url' => (object) [
 						'controller' => $controller,
 						'view' => $view
 					],
-					'page' =>  VIEW . $controller . DS . $view . '.php',
+					'defaultTemplate' => TEMPLATE . 'Layout' . DS . 'default.php',
+					'viewTemplate' =>  TEMPLATE . $controller . DS . $view . '.php',
 					'controller' => self::$namespace . $controller . 'Controller',
 					'args' => $this->getRequestArgs(),
 					'data' => $this->getData()
@@ -119,10 +130,5 @@
 		protected function getRoute()
 		{
 			return $this->router;
-		}
-
-		protected function makeRequest()
-		{
-			return $this->getHeader();
 		}
 	}

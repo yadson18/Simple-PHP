@@ -3,13 +3,13 @@
 
 	class PageController extends AppController
 	{
-		public function __construct($request)
+		public function isAuthorized(string $method)
 		{
-			parent::initialize($request);
+			return true;
 		}
 
 		public function home()
 		{ 
-
+			
 		}
 	}
