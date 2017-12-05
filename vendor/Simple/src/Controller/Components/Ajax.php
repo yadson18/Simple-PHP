@@ -1,22 +1,23 @@
-<?php 
+<?php  
 	namespace Simple\Controller\Components;
-
+	
 	class Ajax
 	{
 		private $response;
 
-		public function response($data)
+		public function response(array $data)
 		{
-			if (!empty($data) && !is_resource($data)) {
+			if (!empty($data)) {
 				$this->response = $data;
 			}
 			else {
 				$this->response = [
-					"status" => "error",
-					"message" => "Ajax response cannot be empty or resource type"
+					'status' => 'error',
+					'message' => 'Ajax response cannot be empty or resource type'
 				];
 			}
 		}
+
 		public function notEmptyResponse()
 		{
 			if (isset($this->response)) {
@@ -24,8 +25,10 @@
 			}
 			return false;
 		}
+
 		public function getResponse()
 		{
 			return json_encode($this->response);
 		}
 	}
+?>

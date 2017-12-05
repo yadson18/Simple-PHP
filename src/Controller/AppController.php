@@ -12,6 +12,8 @@
 
 			$this->loadComponent('Ajax');
 
-			$this->loadComponent('Html');
+			$this->loadComponent('Flash');
+
+			$this->loadComponent('Session');
 		}	
 	}

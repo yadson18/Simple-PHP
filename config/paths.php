@@ -22,3 +22,9 @@
 	define('SIMPLE', SIMPLE_PATH . 'src' . DS);
 
 	define('WWW_ROOT', ROOT . DS . 'webroot' . DS);
+
+	define('CSS', WWW_ROOT . 'css' . DS);
+
+	define('JS', WWW_ROOT . 'js' . DS);
+
+	define('LESS', WWW_ROOT . 'less' . DS);
