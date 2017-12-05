@@ -5,7 +5,7 @@
 	{
 		public function isAuthorized(string $method)
 		{
-			return true;
+			return $this->alowedMethods($method, ['home']);
 		}
 
 		public function home()

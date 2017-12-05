@@ -3,6 +3,7 @@
 
 	use Simple\Controller\Interfaces\ControllerInterface;
 	use Simple\Routing\Router;
+	use Simple\View\View;
 	use \stdClass;
 
 	class Request
@@ -43,45 +44,63 @@
 
 		public function getResponse()
 		{
-			if ($this->statusCodeIs(200)) {
-				return $this->getHeader();
-			}
-			return false;
+			if ($this->getHeader()->response->status === 'success') {
+				$header = $this->getHeader();
+				
+			 } 
 		}
 
 		protected function getHeader()
 		{
-			$controller = $this->getRoute()->getController();
+			$controllerName = $this->getRoute()->getController();
+			$controller = self::$namespace . $controllerName . 'Controller';
 			$view = $this->getRoute()->getView();
-			
+
+			if (class_exists($controller)) {
+				$controllerInstance = new $controller();
+
+				if (@call_user_func_array([$controllerInstance, 'isAuthorized'], [$view]) &&
+					is_callable([$controllerInstance, 'initialize']) &&
+					is_callable([$controllerInstance, $view])
+				) {
+					$viewInstance = new View($controllerName . DS . $view);
+
+					@call_user_func_array([$controllerInstance, 'initialize'], [$this, $viewInstance]);
+
+					return (object) [
+						'request' => (object) [
+							'type' => $this->getRequestType(),
+							'url' => (object) [
+								'controller' => $controllerName,
+								'view' => $view
+							],
+							'args' => $this->getRequestArgs(),
+							'data' => $this->getData()
+						],
+			 			'response' => (object) [
+			 				'controller' => $controllerInstance,
+							'view' => $viewInstance,
+			 				'status' => 'success'
+			 			]
+					];
+				}
+			}
 			return (object) [
 				'request' => (object) [
-					'status' => $this->getStatusCode(),
 					'type' => $this->getRequestType(),
 					'url' => (object) [
-						'controller' => $controller,
+						'controller' => $controllerName,
 						'view' => $view
 					],
-					'defaultTemplate' => TEMPLATE . 'Layout' . DS . 'default.php',
-					'viewTemplate' =>  TEMPLATE . $controller . DS . $view . '.php',
-					'controller' => self::$namespace . $controller . 'Controller',
 					'args' => $this->getRequestArgs(),
 					'data' => $this->getData()
+				],
+				'response' => (object) [
+					'controller' => null,
+					'view' => null,
+					'status' => 'error'
 				]
 			];
-		}
-
-		protected function getStatusCode()
-		{
-			return http_response_code();
-		}
-
-		public function statusCodeIs(int $statusCode)
-		{
-			if ($statusCode === $this->getStatusCode()) {
-				return true;
-			}
-			return false;
 		}
 
 		protected function setRequestType(string $requestType)

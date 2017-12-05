@@ -25,7 +25,8 @@
 
 		public function start(Request $request)
 		{
-			$response = $request->getResponse();
+			
+
 			
 			//include $response->request->defaultTemplate;
 			/*$controller = $header->request->controller;
