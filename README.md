@@ -6,13 +6,14 @@ Configurações para o uso do framework.
 		# apt-get install -y php
 	
 	Instale o Apache.
-		# apt-get install apache2.
+		# apt-get install apache2
 	
 	Instale um SGBD de sua preferência.
 	
 	Defina o diretório "webroot" como raíz do projeto nas configurações do Apache.
 	
 	Habilite o módulo do Apache para reescrita de URL's.
+		# a2enmod rewrite
 	
 	Modifique o arquivo "apache.conf".
 		De:
