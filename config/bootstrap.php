@@ -24,16 +24,17 @@
 
 
 	use Simple\Application\Application;
-	/*use Simple\Database\Database;
 	use Simple\Error\ErrorHandler;
-	use Simple\Mailer\Email;*/
 	use Simple\Routing\Router;
+	use Simple\View\View;
+	/*use Simple\Database\Database;
+	use Simple\Mailer\Email;*/
 	/*use Simple\Http\Integrator\Webservice;*/
 
-	Application::configErrorPage($config->use('App.errorPage'));
+	ErrorHandler::configPageError($config->use('App.errorPage'));
 	Application::configAppName($config->use('App.name'));
-	/*Database::configDatabase($config->use('Databases'));
-	ErrorHandler::configDisplayError($config->use('App.displayErrors'));
-	Email::configEmail($config->use('Email.default'));*/
+	View::configErrorPage($config->use('App.errorPage'));
 	Router::configRoute($config->use('Route.default'));
+	/*Database::configDatabase($config->use('Databases'));
+	Email::configEmail($config->use('Email.default'));*/
 	/*Webservice::configConnection($config->use('Webservice'));*/

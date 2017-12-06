@@ -6,12 +6,12 @@
 	$config
 	
 		->set('App', [
-			'name' => 'Application Name -',
+			'name' => 'Application Name - ',
 			'displayErrors' => true,
 			'encoding' => 'utf-8',
 			'timezone' => 'UTC',
 			'locate' => 'pt-Br',
-			'errorPage' => TEMPLATE . 'ErrorPages' . DS . 'daniedAccess.php'
+			'errorPage' => 'danied-access.php'
 		])
 
 		->set('Route', [

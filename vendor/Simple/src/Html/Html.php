@@ -1,5 +1,5 @@
 <?php  
-    namespace Simple\Controller\Components;
+    namespace Simple\Html;
     
     class Html
     {

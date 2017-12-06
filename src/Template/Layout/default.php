@@ -17,7 +17,7 @@
 		<?= $this->Html->script('less.min.js') ?>
 	</head>
 	<body>	
-		<nav class='navbar navbar-default navbar-fixed-top" id="home-nav'>
+		<nav class='navbar navbar-default navbar-fixed-top' id='home-nav'>
 		    <div class='container-fluid'>
 		        <div class='navbar-header'>
 		            <button type='button' class='navbar-toggle collapsed' data-toggle='collapse' data-target='#responsive-menu' aria-expanded='false'>

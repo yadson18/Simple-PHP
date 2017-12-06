@@ -5,6 +5,8 @@
 	{
 		private static $defaultTemplate = TEMPLATE . 'Layout' . DS . 'default.php';
 
+		private static $errorPage;
+
 		private $title;
 
 		private $viewTemplate;
@@ -16,12 +18,19 @@
 			$this->setViewTemplate($viewTemplate);
 		}
 
-		public function getDefaultTemplate()
+		public function isValidTemplate()
 		{
-			if (is_file(static::$defaultTemplate)) {
-				return static::$defaultTemplate;
+			if (is_file($this->getViewTemplate()) && 
+				is_file($this->getDefaultTemplate())
+			) {
+				return true;
 			}
 			return false;
+		}
+
+		public function getDefaultTemplate()
+		{
+			return static::$defaultTemplate;
 		}
 
 		public function setTitle(string $title)
@@ -41,10 +50,7 @@
 
 		public function getViewTemplate()
 		{
-			if (is_file($this->viewTemplate)) {
-				return $this->viewTemplate;
-			}
-			return false;
+			return $this->viewTemplate;
 		}
 
 		public function setViewVars(array $viewVars)
@@ -55,5 +61,10 @@
 		public function getViewVars()
 		{
 			return $this->viewVars;
+		}
+
+		public static function configErrorPage(string $errorPagePath)
+		{
+			static::$errorPage = $errorPagePath;
 		}
 	}

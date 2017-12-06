@@ -1,4 +1,4 @@
-Configurações para uso.
+Configurações para o uso do framework.
 	
 	Instale o PHP.
 		# add-apt-repository ppa:ondrej/php
@@ -21,7 +21,7 @@ Configurações para uso.
 				AllowOverride None
 				Require all danied
 			</Directory>	
-					</div>
+
 		Para:
 			<Directory /var/www/>
 				Options Indexes FollowSymLinks

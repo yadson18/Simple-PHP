@@ -23,13 +23,11 @@
 
 		public function listening()
 		{
-			$this->getApp()->bootstrap();
-			
-			if ($this->getApp()->bootstrapFileStatus()) {
+			if ($this->getApp()->bootstrap()) {
 				$this->makeRequest(new Request($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']));
 
 				return true;
-			}
+			};
 			return false;
 		}
 

@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Email Test</title>
-	<style type="text/css">
-		h1{
-			color: purple;
-		}
-	</style>
+	<title>Email Title</title>
 </head>
 <body>
-	<h1>Testando mensagem de Iza</h1>
+	<h1>Testing</h1>
 </body>
 </html>

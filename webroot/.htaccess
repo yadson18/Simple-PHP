@@ -1,5 +1,3 @@
-# O arquivo .htaccess serve para o apache interpretar e reescrever as URL's, de acordo com as condições abaixo.
-
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 	RewriteCond %{REQUEST_FILENAME} !-f

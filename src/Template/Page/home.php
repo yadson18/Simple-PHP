@@ -1,6 +1,6 @@
 <div id='home-container' class='col-md-12 col-sm-12 col-xs-12'>
     <div class='banner'>
-        <h1 class='banner-title'>Framework</h1>
+        <h1 class='banner-title'>Simple PHP</h1>
         <img src='/images/notebook.png' class='banner-image'>
     </div>
     <div class='features'>

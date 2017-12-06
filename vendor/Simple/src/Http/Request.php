@@ -3,7 +3,6 @@
 
 	use Simple\Controller\Interfaces\ControllerInterface;
 	use Simple\Routing\Router;
-	use Simple\View\View;
 	use \stdClass;
 
 	class Request
@@ -45,53 +44,35 @@
 		public function getResponse()
 		{
 			$controllerName = $this->getRoute()->getController();
+			$viewName = $this->getRoute()->getView();
 			$controller = self::$namespace . $controllerName . 'Controller';
-			$view = $this->getRoute()->getView();
 
 			if (class_exists($controller)) {
 				$controllerInstance = new $controller();
 
-				if (@call_user_func_array([$controllerInstance, 'isAuthorized'], [$view]) &&
+				if (@call_user_func_array([$controllerInstance, 'isAuthorized'], [$viewName]) &&
 					is_callable([$controllerInstance, 'initialize']) &&
-					is_callable([$controllerInstance, $view])
+					is_callable([$controllerInstance, $viewName])
 				) {
-					$viewInstance = new View($controllerName . DS . $view);
-
-					@call_user_func_array([$controllerInstance, 'initialize'], [$this, $viewInstance]);
-
 					return (object) [
-						'request' => (object) [
-							'type' => $this->getRequestType(),
-							'url' => (object) [
-								'controller' => $controllerName,
-								'view' => $view
-							],
-							'args' => $this->getRequestArgs(),
-							'data' => $this->getData()
-						],
-			 			'response' => (object) [
+						'data' => (object) [
+			 				'viewTemplate' => $controllerName . DS . $viewName,
 			 				'controller' => $controllerInstance,
-							'view' => $viewInstance,
-			 				'status' => 'success'
-			 			]
+			 				'view' => $viewName,
+			 				'args' => $this->getRequestArgs(),
+			 			],
+						'status' => 'success'
 					];
 				}
 			}
 			return (object) [
-				'request' => (object) [
-					'type' => $this->getRequestType(),
-					'url' => (object) [
-						'controller' => $controllerName,
-						'view' => $view
-					],
-					'args' => $this->getRequestArgs(),
-					'data' => $this->getData()
-				],
-				'response' => (object) [
+				'data' => (object) [
+					'viewTemplate' => $controllerName . DS . $viewName,
 					'controller' => null,
-					'view' => null,
-					'status' => 'error'
-				]
+					'view' => $viewName,
+					'args' => $this->getRequestArgs(),
+				],
+				'status' => 'error'
 			];
 		}
 

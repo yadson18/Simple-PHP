@@ -1,77 +1,102 @@
 <?php
 	namespace Simple\Application;
 
+	use Simple\Error\ErrorHandler;
 	use Simple\Http\Request;
+	use Simple\Html\Html;
+	use Simple\Html\Form;
+	use Simple\View\View;
 
 	class Application
 	{
 		private static $appName;
 		
-		private static $errorPage;
-		
 		private $bootstrapPath;
 
-		private $bootstrapIsLoaded = false; 
+		private $error;
+
+		private $view;
+
+		public $Html;
+
+		public $Form;
 
 		public function __construct(string $bootstrapPath)
 		{
 			$this->setBootstrapPath($bootstrapPath);
+			$this->error = new ErrorHandler();
+			$this->Html = new Html();
+			$this->Form = new Form();
 		}
 
-		public function fetchAll()
+		public function fetch(string $dataIndex)
 		{
+			if (isset($this->view)) {
+				switch ($dataIndex) {
+					case 'title': return $this->view->getTitle(); break;
+					case 'appName': return $this->getAppName(); break;
+					case 'content': 
+						ob_start();
+						
+						if (!empty($this->view->getViewVars())) {
+							foreach ($this->view->getViewVars() as $variableName => $value) {
+								if (is_string($variableName)) {
+									$$variableName = $value;
+								}
+							}
+						}
+						require_once $this->view->getViewTemplate(); 
 
+						return ob_get_clean();
+					break;
+				}
+			}
 		}
 
 		public function start(Request $request)
 		{
-			$result = $request->getResponse();
+			if ($request->getResponse()->status === 'success') {
+				$response = $request->getResponse()->data;
 
-			if ($result->response->status === 'success') {
-				$controllerInstance = $result->response->controller;
-				$viewInstance = $result->response->view;
-				
+				$this->view = new View($response->viewTemplate);
+				$controller = $response->controller;
+
+				@call_user_func_array([$controller, 'initialize'], [$request, $this->view]);
 				$result = @call_user_func_array(
-					[$controllerInstance, $result->request->url->view], [$result->request->args]
+					[$controller, $response->view], [$response->args]
 				);
 
-				if (isset($result['redirect'])) {
-					echo 'redirect';
-				}
-				else if (isset($controllerInstance->Ajax) && 
-						 $controllerInstance->Ajax->notEmptyResponse()
+				if (isset($result['redirectTo']) && 
+					$result['redirectTo'] !== $response->viewTemplate
 				) {
-					echo $controllerInstance->Ajax->getResponse();
+					header('Location: /' . $result['redirectTo']);
 					exit();
 				}
 				else {
-					echo 'Get page';
+					if (isset($controller->Ajax) && $controller->Ajax->notEmptyResponse()) {
+						echo $controller->Ajax->getResponse();
+						exit();
+					}
+					else if ($this->view->isValidTemplate()) {
+						$this->Flash = (isset($controller->Flash)) ? $controller->Flash : null;
+
+						require_once $this->view->getDefaultTemplate();
+					}
 				}
 			}
-			else {
-				echo 'Fail';
+			else{
+				$this->error->display('Error - Danied Access', 'default');
 			}
 		}
 
 		public function bootstrap()
 		{
 			if (file_exists($this->getBootstrapPath() . 'bootstrap.php')) {
-				$this->bootstrapIsLoaded();
+				require_once $this->getBootstrapPath() . 'bootstrap.php';
 
-				include $this->getBootstrapPath() . 'bootstrap.php';
+				return true;
 			}
-
-			return $this;
-		}
-
-		protected function bootstrapIsLoaded()
-		{
-			$this->bootstrapIsLoaded = true;
-		}
-
-		public function bootstrapFileStatus()
-		{
-			return $this->bootstrapIsLoaded;
+			return false;
 		}
 
 		protected function setBootstrapPath(string $bootstrapPath)
@@ -89,8 +114,8 @@
 			static::$appName = $appName;
 		}
 
-		public static function configErrorPage(string $errorPagePath)
+		public function getAppName()
 		{
-			static::$errorPage = $errorPagePath;
+			return static::$appName;
 		}
 	}

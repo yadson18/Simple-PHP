@@ -12,4 +12,3 @@
 	$server = new Server(new Application(CONFIG));
 
 	$server->run($server->listening());
-

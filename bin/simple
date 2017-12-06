@@ -4,7 +4,7 @@
 
 ROOT=$(pwd);
 
-TEMPLATES_PATH=$ROOT/vendor/Simple/Mclasses/Templates;
+TEMPLATES_PATH=$ROOT/vendor/Simple/src/Template;
 
 SRC_PATH=$ROOT/src;
 
@@ -12,7 +12,7 @@ CONTROLLER_PATH=$SRC_PATH/Controller;
 
 MODEL_PATH=$SRC_PATH/Model;
 
-VIEW_PATH=$SRC_PATH/View;
+VIEW_PATH=$SRC_PATH/Template;
 
 WEBROOT_PATH=$ROOT/webroot;
 
@@ -119,11 +119,7 @@ function makeViewDir(){
 			else
 				mkdir $dirName;
 
-				if [ "$dirName" != 0 ]; then
-					echo 1;
-				else
-					echo 0;
-				fi
+				echo 1;
 			fi
 		else
 			echo 0;
@@ -202,7 +198,7 @@ if [ $# -eq 3 ] && [ "$1" == mclasses ] && [ "$2" != "" ] && [ "$3" != "" ]; the
 	databaseName=$2;
 	tableName=$3;  
 
-	content=$(getFileQuery $tableName .classAttributes.sql);
+	content=$(getFileQuery $tableName .classCreator.sql);
 
 	if [ "$content" != 0 ]; then
 		echo $content > $fileContent;
