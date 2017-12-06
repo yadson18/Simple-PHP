@@ -25,41 +25,32 @@
 
 		public function start(Request $request)
 		{
-			
+			$result = $request->getResponse();
 
-			
-			//include $response->request->defaultTemplate;
-			/*$controller = $header->request->controller;
-				$view = $header->request->url->view;
+			if ($result->response->status === 'success') {
+				$controllerInstance = $result->response->controller;
+				$viewInstance = $result->response->view;
+				
+				$result = @call_user_func_array(
+					[$controllerInstance, $result->request->url->view], [$result->request->args]
+				);
 
-				if (class_exists($controller)) {
-					return $this->makeRequest($header, new $controller, $view);
+				if (isset($result['redirect'])) {
+					echo 'redirect';
 				}
-			include $request->getResponse();
-			if (is_callable([$controller, 'isAuthorized']) &&
-				is_callable([$controller, 'initialize'])
-			) {
-				if ($controller->isAuthorized($view)) {
-					$controller->initialize($this); 
-					$result = $controller->$view($header->request->args);
-
-					if ($controller->Ajax->notEmptyResponse()) {
-						echo $controller->Ajax->getResponse();
-
-						exit();
-					}
-					else if(is_file($header->request->page)) {
-						ob_start();
-
-						$this->Html = $controller->Html;
-						$this->Ajax = $controller->Ajax;
-
-						include static::$defaultTemplate;
-
-						return ob_get_clean();
-					}
+				else if (isset($controllerInstance->Ajax) && 
+						 $controllerInstance->Ajax->notEmptyResponse()
+				) {
+					echo $controllerInstance->Ajax->getResponse();
+					exit();
 				}
-			}*/
+				else {
+					echo 'Get page';
+				}
+			}
+			else {
+				echo 'Fail';
+			}
 		}
 
 		public function bootstrap()

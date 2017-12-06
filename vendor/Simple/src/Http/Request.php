@@ -44,14 +44,6 @@
 
 		public function getResponse()
 		{
-			if ($this->getHeader()->response->status === 'success') {
-				$header = $this->getHeader();
-				
-			 } 
-		}
-
-		protected function getHeader()
-		{
 			$controllerName = $this->getRoute()->getController();
 			$controller = self::$namespace . $controllerName . 'Controller';
 			$view = $this->getRoute()->getView();
