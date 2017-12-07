@@ -28,7 +28,7 @@
 
 		public function getResponse()
 		{
-			return json_encode($this->response);
+			return ['response' => json_encode($this->response)];
 		}
 	}
 ?>

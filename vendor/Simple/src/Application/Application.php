@@ -45,7 +45,7 @@
 								}
 							}
 						}
-						require_once $this->view->getViewTemplate(); 
+						require_once $this->view->getTemplate(); 
 
 						return ob_get_clean();
 					break;
@@ -55,37 +55,24 @@
 
 		public function start(Request $request)
 		{
-			if ($request->getResponse()->status === 'success') {
-				$response = $request->getResponse()->data;
+			$response = $request->getResponse();
+			$this->view = $response->view;
 
-				$this->view = new View($response->viewTemplate);
-				$controller = $response->controller;
-
-				@call_user_func_array([$controller, 'initialize'], [$request, $this->view]);
-				$result = @call_user_func_array(
-					[$controller, $response->view], [$response->args]
-				);
-
-				if (isset($result['redirectTo']) && 
-					$result['redirectTo'] !== $response->viewTemplate
-				) {
-					header('Location: /' . $result['redirectTo']);
-					exit();
+			if ($response->status === 'success') {
+				if ($response->content === 'redirect') {
+					header('Location: /' . $response->redirectTo);
 				}
-				else {
-					if (isset($controller->Ajax) && $controller->Ajax->notEmptyResponse()) {
-						echo $controller->Ajax->getResponse();
-						exit();
-					}
-					else if ($this->view->isValidTemplate()) {
-						$this->Flash = (isset($controller->Flash)) ? $controller->Flash : null;
-
-						require_once $this->view->getDefaultTemplate();
-					}
+				else if($response->content === 'ajax' || $response->content === 'default') {
+					$this->Flash = $response->flash;
 				}
 			}
-			else{
-				$this->error->display('Error - Danied Access', 'default');
+			else {
+				$this->view->setTemplate('daniedAccess');
+				$this->view->setTitle('Error');
+			}
+			
+			if ($this->view->canBeRender()) {
+				require_once $this->view->getLayout();
 			}
 		}
 

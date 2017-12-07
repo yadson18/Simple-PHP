@@ -3,7 +3,7 @@
 
 	class ErrorHandler
 	{
-		private static $defaultTemplate = TEMPLATE . 'Error' . DS . 'Default' . DS . 'default.php';
+		private static $defaultTemplate = TEMPLATE . 'Layout' . DS . 'error.php';
 
 		private static $templatePath = TEMPLATE . 'Error' . DS;
 

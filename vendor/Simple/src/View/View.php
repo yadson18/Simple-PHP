@@ -3,34 +3,58 @@
 
 	class View
 	{
-		private static $defaultTemplate = TEMPLATE . 'Layout' . DS . 'default.php';
-
 		private static $errorPage;
+
+		private $layout = TEMPLATE . 'Layout' . DS;
+
+		private $contentType;
+		
+		private $templatePath;
 
 		private $title;
 
-		private $viewTemplate;
-
+		private $template;
+	
 		private $viewVars;
 
-		public function __construct(string $viewTemplate)
+
+		public function initialize(string $contentType, string $templatePath)
 		{
-			$this->setViewTemplate($viewTemplate);
+			$this->setContentType($contentType);
+			$this->setTemplatePath($templatePath);
 		}
 
-		public function isValidTemplate()
+		public function canBeRender()
 		{
-			if (is_file($this->getViewTemplate()) && 
-				is_file($this->getDefaultTemplate())
-			) {
+			if (is_file($this->getLayout()) && is_file($this->getTemplate())) {
 				return true;
 			}
 			return false;
 		}
 
-		public function getDefaultTemplate()
+		public function setContentType(string $contentType)
 		{
-			return static::$defaultTemplate;
+			$this->contentType = $contentType;
+		}
+
+		public function getContentType()
+		{
+			return $this->contentType;
+		}
+
+		public function getLayout()
+		{
+			return $this->layout . $this->getContentType() . '.php';
+		}
+
+		protected function setTemplatePath(string $templatePath)
+		{
+			$this->templatePath = $templatePath;
+		}
+
+		protected function getTemplatePath()
+		{
+			return $this->templatePath;
 		}
 
 		public function setTitle(string $title)
@@ -43,14 +67,14 @@
 			return $this->title;
 		}
 
-		protected function setViewTemplate(string $viewTemplate)
+		public function setTemplate(string $template)
 		{
-			$this->viewTemplate = TEMPLATE . $viewTemplate . '.php';
+			$this->template = $template . '.php';
 		}
 
-		public function getViewTemplate()
+		public function getTemplate()
 		{
-			return $this->viewTemplate;
+			return $this->getTemplatePath() . $this->template;
 		}
 
 		public function setViewVars(array $viewVars)
@@ -61,10 +85,5 @@
 		public function getViewVars()
 		{
 			return $this->viewVars;
-		}
-
-		public static function configErrorPage(string $errorPagePath)
-		{
-			static::$errorPage = $errorPagePath;
 		}
 	}

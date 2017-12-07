@@ -3,6 +3,7 @@
 
 	use Simple\Controller\Interfaces\ControllerInterface;
 	use Simple\Routing\Router;
+	use Simple\View\View;
 	use \stdClass;
 
 	class Request
@@ -43,35 +44,70 @@
 
 		public function getResponse()
 		{
-			$controllerName = $this->getRoute()->getController();
-			$viewName = $this->getRoute()->getView();
-			$controller = self::$namespace . $controllerName . 'Controller';
+			$viewInstance = new View();
+			$controller = $this->getRoute()->getController();
+			$view = $this->getRoute()->getView();
+			$url = $controller . '/' . $view;
+			$classNamespace = self::$namespace . $controller . 'Controller';
 
-			if (class_exists($controller)) {
-				$controllerInstance = new $controller();
+			if (class_exists($classNamespace)) {
+				$controllerInstance = new $classNamespace();
 
-				if (@call_user_func_array([$controllerInstance, 'isAuthorized'], [$viewName]) &&
-					is_callable([$controllerInstance, 'initialize']) &&
-					is_callable([$controllerInstance, $viewName])
-				) {
-					return (object) [
-						'data' => (object) [
-			 				'viewTemplate' => $controllerName . DS . $viewName,
-			 				'controller' => $controllerInstance,
-			 				'view' => $viewName,
-			 				'args' => $this->getRequestArgs(),
-			 			],
-						'status' => 'success'
-					];
+				if (@call_user_func_array([$controllerInstance, 'isAuthorized'], [$view])) {
+					if (is_callable([$controllerInstance, 'initialize']) &&
+						is_callable([$controllerInstance, $view])
+					) {
+						$viewInstance->setTemplate($view);
+						call_user_func_array(
+							[$controllerInstance, 'initialize'], [$this, $viewInstance]
+						);
+						$result = call_user_func_array(
+							[$controllerInstance, $view], $this->getRequestArgs()
+						);
+
+						if (isset($result['redirect']) && $result['redirect'] !== $url) {
+							return (object) [
+								'content' => 'redirect',
+								'redirectTo' => $result['redirect'],
+								'status' => 'success'
+							];
+						}
+						else {
+							$flash = (isset($controllerInstance->Flash)) ? $controllerInstance->Flash : null;
+
+							if (isset($controllerInstance->Ajax) && 
+								call_user_func([$controllerInstance->Ajax, 'notEmptyResponse']) &&
+								is_callable([$controllerInstance->Ajax, 'getResponse'])
+							) {
+								$viewInstance->initialize('ajax', TEMPLATE . $controller . DS);
+								$viewInstance->setViewVars(
+									call_user_func([$controllerInstance->Ajax, 'getResponse'])
+								);
+
+								return (object) [
+									'content' => 'ajax',
+									'flash' => $flash,
+									'view' => $viewInstance,
+									'status' => 'success'
+								];
+							}
+							$viewInstance->initialize('default', TEMPLATE . $controller . DS);
+							
+							return (object) [
+								'content' => 'default',
+								'flash' => $flash,
+								'view' => $viewInstance,
+								'status' => 'success'
+							];
+						}
+					}
 				}
 			}
+			$viewInstance->initialize('error', TEMPLATE . 'Error' . DS);
+
 			return (object) [
-				'data' => (object) [
-					'viewTemplate' => $controllerName . DS . $viewName,
-					'controller' => null,
-					'view' => $viewName,
-					'args' => $this->getRequestArgs(),
-				],
+				'content' => 'error',
+				'view' => $viewInstance,
 				'status' => 'error'
 			];
 		}

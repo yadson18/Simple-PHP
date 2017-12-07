@@ -27,14 +27,12 @@
 	use Simple\Error\ErrorHandler;
 	use Simple\Routing\Router;
 	use Simple\Html\Html;
-	use Simple\View\View;
 	/*use Simple\Database\Database;
 	use Simple\Mailer\Email;*/
 	/*use Simple\Http\Integrator\Webservice;*/
 
 	ErrorHandler::configPageError($config->use('App.errorPage'));
 	Application::configAppName($config->use('App.name'));
-	View::configErrorPage($config->use('App.errorPage'));
 	Html::configEncode($config->use('App.encoding'));
 	Router::configRoute($config->use('Route.default'));
 	/*Database::configDatabase($config->use('Databases'));
