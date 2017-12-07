@@ -3,119 +3,91 @@
     
     class Form
     {
-        private $avaliableAttributes = [
-            "input" => [
-                "class", "id", "name", "placeholder", "required",
-                "type" => [
-                    "number", "date", "datetime", "time", "text", "radio", 
-                    "checkbox", "submit", "button", "color", "password", "textarea"
-                ]
+        private static $defaultOptions = [
+            'form' => [
+                'method' => 'POST'
             ],
-            "button" => [
-                "class", "id", "type" => ["submit", "button"]
+            'input' => [
+                'type' => 'text', 'class' => 'form-control'
+            ],
+            'button' => [
+                'type' => 'submit', 'class' => 'btn btn-default', 
             ]
         ];
 
-        protected function getAvaliableAtts(string $tagName)
+        public function input(string $labelName, array $options = [])
         {
-            if (isset($this->avaliableAttributes[$tagName])) {
-                return $this->avaliableAttributes[$tagName];
+            $options = $this->mergeOptions('input', $options);
+            if (!isset($options['name'])) {
+                $options['name'] = strtolower($labelName);
             }
+            if (!isset($options['id'])) {
+                $options['id'] = strtolower($labelName);
+            }
+
+            return $this->div(
+                $this->mountBlock([
+                    $this->label($labelName), '<input' . $this->mountOptions($options) . '/>'
+                ])
+            );
         }
 
-        protected function getTagAttributes(string $tagName, array $attributes = null, string $labelName = null)
+        public function button(string $buttonName, array $options = [])
         {
-            if (!empty($tagName)) {
-                $avaliableAttrs = $this->getAvaliableAtts($tagName);
-                $tagAttributes = [];
-
-                if (!empty($attributes)) {
-                    foreach ($attributes as $attribute => $value) {
-                        if (is_string($attribute)) {
-                            if (in_array($attribute, $avaliableAttrs)) {
-                                $tagAttributes[$attribute] = $value;
-                            }
-                            else if (isset($avaliableAttrs[$attribute])) {
-                                if (in_array($value, $avaliableAttrs[$attribute])) {
-                                    $tagAttributes[$attribute] = $value;
-                                }
-                            }
-                        }
-                        else {
-                            $tagAttributes[$value] = "";
-                        }
-                    }
-                }
-
-                if ($tagName === "input" || $tagName === "select" || $tagName === "button") {
-                    if (!array_key_exists("class", $tagAttributes)) {
-                        $tagAttributes["class"] = "form-control ".strtolower(removeSpecialChars($labelName));
-                        
-                        if ($tagName === "button") {
-                            $tagAttributes["class"] .= " btn btn-default";
-                        }
-                    }
-                    if ($tagName === "input" || $tagName === "select") {
-                        if (!array_key_exists("name", $tagAttributes)) {
-                            $tagAttributes["name"] = strtolower(removeSpecialChars($labelName));
-                        }
-                    }
-                }
-
-                $stringAttributes = "";
-                foreach($tagAttributes as $attribute => $value){
-                    $stringAttributes .= " {$attribute}='{$value}'";
-                }
-
-                return $stringAttributes;
+            $options = $this->mergeOptions('button', $options);
+            if (!isset($options['id'])) {
+                $options['id'] = strtolower($buttonName);
             }
-            return false;
+
+            return $this->div(
+                '<button' . $this->mountOptions($options) . '>' . $buttonName . '</button>'
+            );
         }
 
-        public function start(array $config)
+        public function start(array $options = [])
         {
-            $form = "<form";
-
-            foreach ($config as $attribute => $value) {
-                $form.= " {$attribute}='{$value}'";
-            }
-
-            return "{$form}>";
+            return '<form' . $this->mountOptions($this->mergeOptions('form', $options)) . '>';
         }
 
         public function end()
         {
-            return "</form>";
+            return '</form>';
         }
 
-        public function input(string $name, array $attributes = null)
+        protected function label(string $name)
         {
-            if (!empty($name)) {
-                $inputAttributes = $this->getTagAttributes("input", $attributes, $name);
-                
-                if (!empty($inputAttributes)) {
-                    return "
-                        <div class='form-group'>
-                            <label>{$name}</label>
-                            <input {$inputAttributes}/>
-                        </div>
-                    ";
-                }
+            return '<label>' . $name . '</label>';
+        }
+
+        protected function div(string $elements)
+        {
+            return '<div class="form-group">' . $elements . '</div>';
+        }
+
+        protected function mergeOptions(string $elementName, array $options)
+        {
+            return array_merge($this->getDefaultOptions($elementName), $options);
+        }
+
+        protected function mountOptions(array $options)
+        {
+            $elementOptions = '';
+
+            foreach ($options as $attribute => $value) {
+                $elementOptions .= ' ' . $attribute . '="' . $value . '"';
             }
+            return $elementOptions;
         }
 
-        public function buttonSubmit(string $text, array $attributes = null)
+        protected function mountBlock(array $blocks)
         {
-            if (!empty($text)) {
-                $buttonAttributes = $this->getTagAttributes("button", $attributes);
-                
-                if (!empty($buttonAttributes)) {
-                    return "
-                        <div class='form-group'>
-                            <button {$buttonAttributes}>{$text}</button>
-                        </div>
-                    ";
-                }
+            return implode($blocks);
+        }
+        
+        protected function getDefaultOptions(string $elementName)
+        {
+            if (isset(static::$defaultOptions[$elementName])) {
+                return static::$defaultOptions[$elementName];
             }
         }
     }

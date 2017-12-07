@@ -86,6 +86,10 @@
 
 								return (object) [
 									'content' => 'ajax',
+									'pageInfo' => (object) [
+										'controllerName' => $controller,
+										'viewName' => $view
+									],
 									'flash' => $flash,
 									'view' => $viewInstance,
 									'status' => 'success'
@@ -95,6 +99,10 @@
 							
 							return (object) [
 								'content' => 'default',
+								'pageInfo' => (object) [
+									'controllerName' => $controller,
+									'viewName' => $view
+								],
 								'flash' => $flash,
 								'view' => $viewInstance,
 								'status' => 'success'

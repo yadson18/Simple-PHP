@@ -10,6 +10,10 @@
 	class Application
 	{
 		private static $appName;
+
+		private $controllerName;
+
+		private $viewName;
 		
 		private $bootstrapPath;
 
@@ -34,6 +38,8 @@
 			if (isset($this->view)) {
 				switch ($dataIndex) {
 					case 'title': return $this->view->getTitle(); break;
+					case 'controllerName': return $this->getControllerName(); break;
+					case 'viewName': return $this->getViewName(); break;
 					case 'appName': return $this->getAppName(); break;
 					case 'content': 
 						ob_start();
@@ -63,7 +69,13 @@
 					header('Location: /' . $response->redirectTo);
 				}
 				else if($response->content === 'ajax' || $response->content === 'default') {
+					$this->setControllerName($response->pageInfo->controllerName);
+					$this->setViewName($response->pageInfo->viewName);
 					$this->Flash = $response->flash;
+
+					if (empty($this->view->getTitle())) {
+						$this->view->setTitle($this->getViewName());
+					}
 				}
 			}
 			else {
@@ -104,5 +116,25 @@
 		public function getAppName()
 		{
 			return static::$appName;
+		}
+
+		protected function setControllerName(string $controllerName)
+		{
+			$this->controllerName = $controllerName;
+		}
+		
+		protected function getControllerName()
+		{
+			return $this->controllerName;
+		}
+
+		protected function setViewName(string $viewName)
+		{
+			$this->viewName = $viewName;
+		}
+
+		protected function getViewName()
+		{
+			return $this->viewName;
 		}
 	}
