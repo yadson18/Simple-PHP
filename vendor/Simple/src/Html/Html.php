@@ -3,10 +3,17 @@
     
     class Html
     {
+        private static $encode;
+
+        public function encoding()
+        {
+            return '<meta charset="' . static::$encode . '"/>';
+        }
+
         public function css(string $cssName)
         {
             if (is_file(CSS . $cssName)) {
-      		    return '<link rel="stylesheet" type="text/css" href="/css/' . $cssName . '">';
+      		    return '<link rel="stylesheet" type="text/css" href="/css/' . $cssName . '"/>';
             }
     	}
 
@@ -22,5 +29,10 @@
             if (is_file(LESS . $lessName)) {
                 return '<link rel="stylesheet/less" type="text/css" href="/less/' . $lessName . '"/>';
             }
+        }
+
+        public static function configEncode(string $encode)
+        {
+            static::$encode = $encode;
         }
 	}

@@ -4,7 +4,7 @@
 		<title><?= $this->fetch('appName') . $this->fetch('title') ?></title>
 		
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
-		<meta charset='utf-8'>
+		<?= $this->Html->encoding() ?>
 
 		<?= $this->Html->css('bootstrap.min.css') ?>
 		<?= $this->Html->css('font-awesome.min.css') ?>
