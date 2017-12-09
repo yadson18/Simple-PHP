@@ -1,170 +1,107 @@
 <?php 
 	namespace Simple\Http;
 
-	use Simple\Controller\Interfaces\ControllerInterface;
 	use Simple\Routing\Router;
-	use Simple\View\View;
-	use \stdClass;
+	use Simple\Http\Response;
+	use stdClass;
 
 	class Request
 	{
-		private static $namespace = 'App\\Controller\\';
+		private $requestMethod;
 
-		private $router;
+		private $requestController;
 
-		private $requestType;
+		private $requestView;
 
 		private $requestData;
 
 		private $requestArgs;
 
-		public function __construct(string $urlRequest, string $requestType)
+		public function __construct(string $urlRequest, string $requestMethod)
 		{
-			$this->setHeader($urlRequest, $requestType);
+			$this->setHeader($urlRequest, $requestMethod);
 		}
 
-		protected function setHeader(string $urlRequest, string $requestType)
+		protected function setHeader(string $urlRequest, string $requestMethod)
 		{
 			$requestArgs = explode("/", substr($urlRequest, 1));
 			$controller = (string) array_shift($requestArgs);
 			$view = (string) array_shift($requestArgs);
 			
-			$this->setRequestType($requestType);	
-			$this->setRoute(new Router($controller, $view));
-            $this->setRequestArgs($requestArgs);
+			$route = new Router($controller, $view);
+			$this->setRequestMethod($requestMethod);
+			$this->setRequestController($route->getController());
+			$this->setRequestView($route->getView());
+			$this->setRequestArgs($requestArgs);
 
-			if ($requestType === 'GET' || $requestType === 'POST' || 
-				$requestType === 'PUT' || $requestType === 'DELETE'
+			if ($requestMethod === 'GET' || $requestMethod === 'POST' || 
+				$requestMethod === 'PUT' || $requestMethod === 'DELETE'
 			) {
             	$this->setRequestData($_REQUEST);
 			}
-
-			return $this;
 		}
 
-		public function getResponse()
+		public function getHeader()
 		{
-			$viewInstance = new View();
-			$controller = $this->getRoute()->getController();
-			$view = $this->getRoute()->getView();
-			$url = $controller . '/' . $view;
-			$classNamespace = self::$namespace . $controller . 'Controller';
-
-			if (class_exists($classNamespace)) {
-				$controllerInstance = new $classNamespace();
-
-				if (@call_user_func_array([$controllerInstance, 'isAuthorized'], [$view])) {
-					if (is_callable([$controllerInstance, 'initialize']) &&
-						is_callable([$controllerInstance, $view])
-					) {
-						$viewInstance->setTemplate($view);
-						call_user_func_array(
-							[$controllerInstance, 'initialize'], [$this, $viewInstance]
-						);
-						$result = call_user_func_array(
-							[$controllerInstance, $view], $this->getRequestArgs()
-						);
-
-						if (isset($result['redirect']) && $result['redirect'] !== $url) {
-							return (object) [
-								'content' => 'redirect',
-								'redirectTo' => $result['redirect'],
-								'status' => 'success'
-							];
-						}
-						else {
-							$flash = (isset($controllerInstance->Flash)) ? $controllerInstance->Flash : null;
-
-							if (isset($controllerInstance->Ajax) && 
-								call_user_func([$controllerInstance->Ajax, 'notEmptyResponse']) &&
-								is_callable([$controllerInstance->Ajax, 'getResponse'])
-							) {
-								$viewInstance->initialize('ajax', TEMPLATE . $controller . DS);
-								$viewInstance->setViewVars(
-									call_user_func([$controllerInstance->Ajax, 'getResponse'])
-								);
-
-								return (object) [
-									'content' => 'ajax',
-									'pageInfo' => (object) [
-										'controllerName' => $controller,
-										'viewName' => $view
-									],
-									'flash' => $flash,
-									'view' => $viewInstance,
-									'status' => 'success'
-								];
-							}
-							$viewInstance->initialize('default', TEMPLATE . $controller . DS);
-							
-							return (object) [
-								'content' => 'default',
-								'pageInfo' => (object) [
-									'controllerName' => $controller,
-									'viewName' => $view
-								],
-								'flash' => $flash,
-								'view' => $viewInstance,
-								'status' => 'success'
-							];
-						}
-					}
-				}
-			}
-			$viewInstance->initialize('error', TEMPLATE . 'Error' . DS);
-
 			return (object) [
-				'content' => 'error',
-				'view' => $viewInstance,
-				'status' => 'error'
+				'requestMethod' => $this->getRequestMethod(),
+				'controller' => $this->getRequestController(),
+				'view' => $this->getRequestView(),
+				'requestData' => $this->getRequestData(),
+				'args' => $this->getRequestArgs()
 			];
 		}
 
-		protected function setRequestType(string $requestType)
+		public function send()
 		{
-			$this->requestType = $requestType;
+			return new Response($this);
 		}
 
-		protected function getRequestType()
-		{
-			return $this->requestType;
+		protected function setRequestMethod(string $requestMethod){
+			$this->requestMethod = $requestMethod;
 		}
 
-		public function is(string $requestType)
-		{
-			if ($this->getRequestType() === $requestType) {
-				return true;
-			}
-			return false;
+		protected function getRequestMethod(){
+			return $this->requestMethod;
 		}
 
-		public function getData()
-		{
+		protected function setRequestController(string $requestController){
+			$this->requestController = $requestController;
+		}
+
+		protected function getRequestController(){
+			return $this->requestController;
+		}
+
+		protected function setRequestView(string $requestView){
+			$this->requestView = $requestView;
+		}
+
+		protected function getRequestView(){
+			return $this->requestView;
+		}
+
+		protected function setRequestData(array $requestData){
+			$this->requestData = $requestData;
+		}
+
+		public function getRequestData(){
 			return $this->requestData;
 		}
 
-		protected function setRequestData(array $requestData)
-		{
-			$this->requestData = (object) $requestData;
-		}
-
-		protected function setRequestArgs(array $requestArgs)
-		{
+		protected function setRequestArgs(array $requestArgs){
 			$this->requestArgs = $requestArgs;
 		}
 
-		protected function getRequestArgs()
-		{
+		public function getRequestArgs(){
 			return $this->requestArgs;
 		}
 
-		protected function setRoute(Router $router)
+		public function is(string $requestMethod)
 		{
-			$this->router = $router;
-		}
-
-		protected function getRoute()
-		{
-			return $this->router;
+			if ($this->getRequestMethod() === $requestMethod) {
+				return true;
+			}
+			return false;
 		}
 	}

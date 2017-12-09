@@ -7,6 +7,8 @@
 	use Simple\Html\Form;
 	use Simple\View\View;
 
+	use Simple\Controller\Component;
+
 	class Application
 	{
 		private static $appName;
@@ -33,35 +35,11 @@
 			$this->Form = new Form();
 		}
 
-		public function fetch(string $dataIndex)
-		{
-			if (isset($this->view)) {
-				switch ($dataIndex) {
-					case 'title': return $this->view->getTitle(); break;
-					case 'controllerName': return $this->getControllerName(); break;
-					case 'viewName': return $this->getViewName(); break;
-					case 'appName': return $this->getAppName(); break;
-					case 'content': 
-						ob_start();
-						
-						if (!empty($this->view->getViewVars())) {
-							foreach ($this->view->getViewVars() as $variableName => $value) {
-								if (is_string($variableName)) {
-									$$variableName = $value;
-								}
-							}
-						}
-						require_once $this->view->getTemplate(); 
-
-						return ob_get_clean();
-					break;
-				}
-			}
-		}
-
 		public function start(Request $request)
 		{
-			$response = $request->getResponse();
+			debug($request->send()->result());
+
+			/*$response = $request->getResponse();
 			$this->view = $response->view;
 
 			if ($response->status === 'success') {
@@ -85,7 +63,7 @@
 			
 			if ($this->view->canBeRender()) {
 				require_once $this->view->getLayout();
-			}
+			}*/
 		}
 
 		public function bootstrap()

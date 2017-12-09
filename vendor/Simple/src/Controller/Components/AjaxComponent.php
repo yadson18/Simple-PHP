@@ -1,7 +1,7 @@
 <?php  
 	namespace Simple\Controller\Components;
 	
-	class Ajax
+	class AjaxComponent
 	{
 		private $response;
 

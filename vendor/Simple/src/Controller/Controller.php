@@ -6,24 +6,37 @@
 
 	abstract class Controller implements Interfaces\ControllerInterface
 	{
+		const CONTROLLER_PATH = 'App\\Controller\\';
+
+		const SUFIX = 'Controller';
+
 		public $Request;
 
 		private $view;
+
+		private $component;
 
 		public function initialize(Request $request, View $view)
 		{
 			$this->Request = $request;
 			
 			$this->view = $view;
+			
+			$this->component = new Component();
 		}
 
 		protected function loadComponent(string $componentName)
 		{
-			$component = 'Simple\\Controller\\Components\\' . $componentName;
-
-			if (class_exists($component)) {
-				$this->$componentName = new $component;
+			$this->component->register($componentName);
+			
+			foreach ($this->getComponents() as $component => $instance) {
+				$this->$component = $instance;
 			}
+		}
+
+		public function getComponents()
+		{
+			return $this->component->getRegistryComponents();
 		}
 
 		protected function setTitle(string $title)
@@ -49,5 +62,15 @@
         		];
         	}
         	return false;
+		}
+
+		public static function getNamespace(string $controllerName)
+		{
+			$controller = Controller::CONTROLLER_PATH . $controllerName . Controller::SUFIX;
+
+			if (class_exists($controller)) {
+				return $controller;
+			}
+			return false;
 		}
 	}

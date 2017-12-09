@@ -80,4 +80,11 @@
 				}
 			}
 		}
+
+		public static function location(string $url)
+		{
+			if (!empty($url)) {
+				header('Location: /' . $url);
+			}
+		}
 	}

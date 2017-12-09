@@ -1,7 +1,7 @@
 <?php  
 	namespace Simple\Controller\Components;
 	
-	class Flash
+	class FlashComponent
 	{
 		private $messageType;
 
