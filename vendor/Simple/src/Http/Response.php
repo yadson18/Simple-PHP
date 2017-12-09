@@ -57,12 +57,11 @@
 						$view->setContentType('default');
 
 					}
-						
+					
+					$view->setComponents($instance->getComponents());
 					$view->setTemplatePath(TEMPLATE . $header->controller . DS);
 					$view->setTemplate($header->view);
 
-					//$view->render();
-					//$view->setContent('/var/www/Simple-PHP/src/Template/Page/home.php');
 					return $view;
 				}
 			}

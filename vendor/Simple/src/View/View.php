@@ -1,6 +1,9 @@
 <?php 
 	namespace Simple\View;
 
+	use Simple\Html\Html;
+	use Simple\Html\Form;
+
 	class View
 	{
 		const LAYOUT = TEMPLATE . 'Layout' . DS;
@@ -25,9 +28,21 @@
 
 		private $content;
 
-		/*public function fetch(string $dataIndex)
+		public function __construct()
 		{
-			if (isset($this->view)) {
+			$this->Html = new Html();
+			$this->Form = new Form();
+		}
+
+		public function setComponents(array $components)
+		{
+			foreach ($components as $componentName => $instance) {
+				$this->$componentName = $instance;
+			}
+		}
+		public function fetch(string $dataIndex)
+		{
+			/*if (isset($this->view)) {
 				switch ($dataIndex) {
 					case 'title': return $this->view->getTitle(); break;
 					case 'controllerName': return $this->getControllerName(); break;
@@ -49,8 +64,8 @@
 						return ob_get_clean();
 					break;
 				}
-			}
-		}*/
+			}*/
+		}
 
 		public function setContentType(string $contentType)
 		{
