@@ -1,7 +1,7 @@
 <?php
 	namespace Simple\Application;
 
-	use Simple\Http\Request;
+	use Simple\Http\Response;
 
 	class Application
 	{
@@ -14,11 +14,16 @@
 			$this->setBootstrapPath($bootstrapPath);
 		}
 
-		public function start(Request $request)
+		public function start(Response $response)
 		{
-			$response = $request->send();
 			$data = $response->result();
-			$data->render();
+
+			if ($data->status === 'success') {
+				$data->view->render();
+			}
+			else {
+				echo $data->message;
+			}
 		}
 
 		public function bootstrap()
@@ -46,7 +51,7 @@
 			static::$appName = $appName;
 		}
 
-		public function getAppName()
+		public static function getAppName()
 		{
 			return static::$appName;
 		}

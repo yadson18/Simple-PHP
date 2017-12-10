@@ -5,6 +5,7 @@
 	use Simple\Routing\Router;
 	use Simple\View\View;
 	use ReflectionClass;
+	use stdClass;
 
 	class Response
 	{
@@ -33,6 +34,7 @@
 			
 			if (!empty($header) && !empty($controller)) {
 				$url = $header->controller . '/' . $header->view;
+				$fullTemplate = TEMPLATE . $header->controller . DS . $header->view . '.php';
 				$reflection = new ReflectionClass($controller);
 				$instance = $reflection->newInstance();
 				$view = new View();
@@ -47,23 +49,36 @@
 					if (isset($result['redirect']) && $result['redirect'] !== $url) {
 						Router::location($result['redirect']);
 					}
-					else if (isset($instance->Ajax) && 
-						call_user_func([$instance->Ajax, 'notEmptyResponse'])
-					) {
-						$view->setContentType('ajax');
+					else if (is_file($fullTemplate)) {
+						if (isset($instance->Ajax) && 
+							call_user_func([$instance->Ajax, 'notEmptyResponse'])
+						) {
+							$view->setContentType('ajax');
+							$view->setViewVars(call_user_func([$instance->Ajax, 'getResponse']));
 
-					}
-					else {
-						$view->setContentType('default');
+						}
+						else {
+							$view->setContentType('default');
 
+						}
+
+						$view->setComponents($instance->getComponents());
+						$view->setControllerName($header->controller);
+						$view->setTemplatePath(TEMPLATE . $header->controller . DS);
+						$view->setTemplate($header->view);
+
+						return (object) [
+							'status' => 'success',
+							'view' => $view
+						];
 					}
 					
-					$view->setComponents($instance->getComponents());
-					$view->setTemplatePath(TEMPLATE . $header->controller . DS);
-					$view->setTemplate($header->view);
-
-					return $view;
 				}
 			}
+			return (object) [
+				'status' => 'error',
+				'message' => 'Check if the class ' . $header->controller . 
+							 'Controller or template ' . $header->view . ' exists.'
+			];
 		}
 	}

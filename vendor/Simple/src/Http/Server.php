@@ -17,14 +17,14 @@
 		public function run(bool $serverStatus)
 		{
 			if ($serverStatus) {
-				$this->getApp()->start($this->getRequest());
+				$this->getApp()->start($this->getRequest()->send());
 			}
 		}
 
 		public function listening()
 		{
 			if ($this->getApp()->bootstrap()) {
-				$this->makeRequest(new Request($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']));
+				$this->setRequest(new Request($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']));
 
 				return true;
 			};
@@ -48,7 +48,7 @@
 			return $this->request;
 		}
 
-		protected function makeRequest(Request $request)
+		protected function setRequest(Request $request)
 		{
 			$this->request = $request;
 		}
