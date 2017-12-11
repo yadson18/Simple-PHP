@@ -9,46 +9,46 @@
 	{
 		private $requestMethod;
 
-		private $requestController;
+		private $controller;
 
-		private $requestView;
+		private $view;
 
-		private $requestData;
+		private $data;
 
-		private $requestArgs;
+		private $args;
 
-		public function __construct(string $urlRequest, string $requestMethod)
+		public function __construct(string $url, string $requestMethod)
 		{
-			$this->setHeader($urlRequest, $requestMethod);
+			$this->setHeader($url, $requestMethod);
 		}
 
-		protected function setHeader(string $urlRequest, string $requestMethod)
+		protected function setHeader(string $url, string $requestMethod)
 		{
-			$requestArgs = explode("/", substr($urlRequest, 1));
+			$requestArgs = explode("/", substr($url, 1));
 			$controller = (string) array_shift($requestArgs);
 			$view = (string) array_shift($requestArgs);
 			
 			$route = new Router($controller, $view);
-			$this->setRequestMethod($requestMethod);
-			$this->setRequestController($route->getController());
-			$this->setRequestView($route->getView());
-			$this->setRequestArgs($requestArgs);
+			$this->setMethod($requestMethod);
+			$this->setController($route->getController());
+			$this->setView($route->getView());
+			$this->setArgs($requestArgs);
 
 			if ($requestMethod === 'GET' || $requestMethod === 'POST' || 
 				$requestMethod === 'PUT' || $requestMethod === 'DELETE'
 			) {
-            	$this->setRequestData($_REQUEST);
+            	$this->setData($_REQUEST);
 			}
 		}
 
 		public function getHeader()
 		{
 			return (object) [
-				'requestMethod' => $this->getRequestMethod(),
-				'controller' => $this->getRequestController(),
-				'view' => $this->getRequestView(),
-				'requestData' => $this->getRequestData(),
-				'args' => $this->getRequestArgs()
+				'requestMethod' => $this->getMethod(),
+				'controller' => $this->getController(),
+				'view' => $this->getView(),
+				'requestData' => $this->getData(),
+				'args' => $this->getArgs()
 			];
 		}
 
@@ -57,44 +57,44 @@
 			return new Response($this);
 		}
 
-		protected function setRequestMethod(string $requestMethod){
+		protected function setMethod(string $requestMethod){
 			$this->requestMethod = $requestMethod;
 		}
 
-		protected function getRequestMethod(){
+		protected function getMethod(){
 			return $this->requestMethod;
 		}
 
-		protected function setRequestController(string $requestController){
-			$this->requestController = $requestController;
+		protected function setController(string $controller){
+			$this->controller = $controller;
 		}
 
-		protected function getRequestController(){
-			return $this->requestController;
+		protected function getController(){
+			return $this->controller;
 		}
 
-		protected function setRequestView(string $requestView){
-			$this->requestView = $requestView;
+		protected function setView(string $view){
+			$this->view = $view;
 		}
 
-		protected function getRequestView(){
-			return $this->requestView;
+		protected function getView(){
+			return $this->view;
 		}
 
-		protected function setRequestData(array $requestData){
-			$this->requestData = $requestData;
+		protected function setData(array $data){
+			$this->data = $data;
 		}
 
-		public function getRequestData(){
-			return $this->requestData;
+		public function getData(){
+			return $this->data;
 		}
 
-		protected function setRequestArgs(array $requestArgs){
-			$this->requestArgs = $requestArgs;
+		protected function setArgs(array $args){
+			$this->args = $args;
 		}
 
-		public function getRequestArgs(){
-			return $this->requestArgs;
+		public function getArgs(){
+			return $this->args;
 		}
 
 		public function is(string $requestMethod)

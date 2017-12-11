@@ -18,12 +18,11 @@
 		{
 			$data = $response->result();
 
-			if ($data->status === 'success') {
-				$data->view->render();
+			if ($data->status === 'error') {
+				$data->view->setTemplateError('Error', 'daniedAccess');
 			}
-			else {
-				echo $data->message;
-			}
+
+			$data->view->render();
 		}
 
 		public function bootstrap()

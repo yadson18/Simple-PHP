@@ -144,6 +144,12 @@
 			}
 		}
 
+		public function setTemplateError(string $templatePath, string $template)
+		{
+			$this->setTemplatePath(TEMPLATE . $templatePath . DS);
+			$this->setTemplate($template);
+		}
+
 		public function setTitle(string $title)
 		{
 			$this->title = $title;

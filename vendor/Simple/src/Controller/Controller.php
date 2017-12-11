@@ -54,11 +54,11 @@
         	if (isset($url['controller']) && !empty($url['controller'])) {
         		if (isset($url['view']) && !empty($url['view'])) {
         			return [
-        				'redirectTo' => $url['controller'] . '/' . $url['view']
+        				'redirect' => $url['controller'] . '/' . $url['view']
         			];
         		}
         		return [
-        			'redirectTo' => $url['controller'] . '/index'
+        			'redirect' => $url['controller'] . '/index'
         		];
         	}
         	return false;

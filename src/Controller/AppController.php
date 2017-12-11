@@ -14,8 +14,6 @@
 			$this->loadComponent('Ajax');
 
 			$this->loadComponent('Flash');
-
-			$this->loadComponent('Session');
 		}	
 
 		protected function alowedMethods(string $method, array $methods)

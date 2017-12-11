@@ -31,13 +31,13 @@
 			$request = $this->getRequest();
 			$header = (!empty($request->getHeader())) ? $request->getHeader() : null;
 			$controller = (!empty($header)) ? Controller::getNamespace($header->controller) : null;
+			$view = new View();
 			
 			if (!empty($header) && !empty($controller)) {
 				$url = $header->controller . '/' . $header->view;
 				$fullTemplate = TEMPLATE . $header->controller . DS . $header->view . '.php';
 				$reflection = new ReflectionClass($controller);
 				$instance = $reflection->newInstance();
-				$view = new View();
 
 				if (call_user_func_array([$instance, 'isAuthorized'], [$header->view]) &&
 					is_callable([$instance, 'initialize']) && 
@@ -59,7 +59,6 @@
 						}
 						else {
 							$view->setContentType('default');
-
 						}
 
 						$view->setComponents($instance->getComponents());
@@ -75,10 +74,11 @@
 					
 				}
 			}
+			$view->setContentType('error');
+
 			return (object) [
 				'status' => 'error',
-				'message' => 'Check if the class ' . $header->controller . 
-							 'Controller or template ' . $header->view . ' exists.'
+				'view' => $view
 			];
 		}
 	}
