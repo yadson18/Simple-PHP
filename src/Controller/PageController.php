@@ -1,8 +1,6 @@
 <?php 
 	namespace App\Controller;
 
-	use Simple\Routing\Router;
-
 	class PageController extends AppController
 	{
 		public function isAuthorized(string $method)
@@ -12,6 +10,6 @@
 
 		public function home()
 		{ 
-			$this->setTitle('Home');
+			$this->setTitle('Home');			
 		}
 	}
