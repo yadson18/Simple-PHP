@@ -16,13 +16,17 @@
 
 		public function start(Response $response)
 		{
-			$data = $response->result();
+			$result = $response->result();
 
-			if ($data->status === 'error') {
-				$data->view->setTemplateError('Error', 'daniedAccess');
+			if (!empty($result)) {
+				if ($result->status === 'error') {
+					$result->view->setTitle('Error');
+					$result->view->setTemplateError('daniedAccess');
+				}
+
+				$result->view->render();
 			}
 
-			$data->view->render();
 		}
 
 		public function bootstrap()

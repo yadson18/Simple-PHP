@@ -6,10 +6,6 @@
 
 	abstract class Controller implements Interfaces\ControllerInterface
 	{
-		const CONTROLLER_PATH = 'App\\Controller\\';
-
-		const SUFIX = 'Controller';
-
 		public $Request;
 
 		private $view;
@@ -49,24 +45,25 @@
 			$this->view->setViewVars($viewVars);
 		}
 
-		protected function redirect(array $url)
+		protected function redirect($route)
         {
-        	if (isset($url['controller']) && !empty($url['controller'])) {
-        		if (isset($url['view']) && !empty($url['view'])) {
-        			return [
-        				'redirect' => $url['controller'] . '/' . $url['view']
-        			];
-        		}
-        		return [
-        			'redirect' => $url['controller'] . '/index'
-        		];
+        	if (is_array($route)) {
+	        	if (isset($route['controller']) && !empty($route['controller'])) {
+	        		if (isset($route['view']) && !empty($route['view'])) {
+	        			return ['redirect' => $route['controller'] . '/' . $route['view']];
+	        		}
+	        		return ['redirect' => $route['controller'] . '/index'];
+	        	}
+        	}
+        	else if (is_string($route)) {
+        		return ['redirect' => $route];
         	}
         	return false;
 		}
 
 		public static function getNamespace(string $controllerName)
 		{
-			$controller = Controller::CONTROLLER_PATH . $controllerName . Controller::SUFIX;
+			$controller = 'App\\Controller\\' . $controllerName . 'Controller';
 
 			if (class_exists($controller)) {
 				return $controller;

@@ -14,10 +14,10 @@
 			'errorPage' => 'danied-access.php'
 		])
 
-		->set('Route', [
+		->set('Routes', [
 			'default' => [
-				"controller" => "Page", 
-				"view" => "home"
+				'controller' => 'Page', 
+				'view' => 'home'
 			]
 		])
 

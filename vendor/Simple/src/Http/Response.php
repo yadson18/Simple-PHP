@@ -46,7 +46,7 @@
 					call_user_func_array([$instance, 'initialize'], [$request, $view]);
 					$result = call_user_func_array([$instance, $header->view], $header->args);
 					
-					if (isset($result['redirect']) && $result['redirect'] !== $url) {
+					if (isset($result['redirect'])) {
 						Router::location($result['redirect']);
 					}
 					else if (is_file($fullTemplate)) {
@@ -75,6 +75,7 @@
 				}
 			}
 			$view->setContentType('error');
+			$view->setTemplatePath(TEMPLATE . 'Error' . DS);
 
 			return (object) [
 				'status' => 'error',

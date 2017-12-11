@@ -15,10 +15,10 @@
 
 		public function register(string $componentName)
 		{
-			$this->setComponentName($componentName);
+			$component = Component::NAMESPACE . $componentName . Component::SUFIX;
 
-			if ($this->componentExists()) {
-				$this->setComponent($componentName, new ReflectionClass($this->getComponentName()));
+			if ($this->componentExists($component)) {
+				$this->setComponent($componentName, new ReflectionClass($component));
 			}
 		}
 
@@ -32,21 +32,11 @@
 			$this->componentsRegistry[$componentName] = $component->newInstance();
 		}
 
-		protected function componentExists()
+		protected function componentExists(string $componentName)
 		{
-			if (class_exists($this->getComponentName())) {
+			if (class_exists($componentName)) {
 				return true;
 			}
 			return false;
-		}
-
-		protected function setComponentName(string $componentName)
-		{
-			$this->componentName = Component::NAMESPACE . $componentName . Component::SUFIX;
-		}
-
-		protected function getComponentName()
-		{
-			return $this->componentName;
 		}
 	}

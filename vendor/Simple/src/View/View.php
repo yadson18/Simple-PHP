@@ -144,10 +144,11 @@
 			}
 		}
 
-		public function setTemplateError(string $templatePath, string $template)
+		public function setTemplateError(string $template)
 		{
-			$this->setTemplatePath(TEMPLATE . $templatePath . DS);
-			$this->setTemplate($template);
+			if ($this->getContentType() === 'error') {
+				$this->setTemplate($template);
+			}
 		}
 
 		public function setTitle(string $title)

@@ -1,11 +1,9 @@
 <?php 
-	namespace Simple\Routing;
+	namespace Simple\Routing; 
 
 	class Router
 	{
-		private static $defaultController;
-
-		private static $defaultView;
+		private static $routes; 
 
 		private $controller;
 
@@ -14,34 +12,6 @@
 		public function __construct(string $controller, string $view)
 		{
 			$this->setRoute(['controller' => $controller, 'view' => $view]);
-		}
-
-		public static function configRoute(array $defaultRoute)
-		{
-			if (isset($defaultRoute['controller']) && isset($defaultRoute['view'])) {
-				static::setDefaultController($defaultRoute['controller']);
-				static::setDefaultView($defaultRoute['view']);
-			}
-		}
-
-		protected function setDefaultController(string $controller)
-		{
-			static::$defaultController = ucfirst($controller);
-		}
-
-		protected function getDefaultController()
-		{
-			return static::$defaultController;
-		}
-
-		protected function setDefaultView(string $view)
-		{
-			static::$defaultView = $view;
-		}
-
-		protected function getDefaultView()
-		{
-			return static::$defaultView;
 		}
 
 		protected function setController(string $controller)
@@ -68,8 +38,12 @@
 		{
 			if (isset($route['controller']) && isset($route['view'])) {
 				if (empty($route['controller'])) {
-					$this->setController(static::getDefaultController());
-					$this->setView(static::getDefaultView());
+					if (static::getRoute('default.controller') && 
+						static::getRoute('default.view')
+					) {
+						$this->setController(static::getRoute('default.controller'));
+						$this->setView(static::getRoute('default.view'));
+					}
 				}
 				else {
 					if (!empty($route['view'])) {
@@ -81,10 +55,30 @@
 			}
 		}
 
-		public static function location(string $url)
+		public static function location(string $route)
 		{
-			if (!empty($url)) {
-				header('Location: /' . $url);
+			if (!empty($route)) {
+				if (static::getRoute($route . '.controller')) {
+					if (!static::getRoute($route . '.view')) {
+						header('Location: /' . static::getRoute($route . '.controller') . '/index');
+					}
+					else {
+						header('Location: /' . implode('/', Router::getRoute($route)));
+					}
+				}
+				else {
+					header('Location: /' . $route);
+				}
 			}
+		}
+
+		public static function configRoutes(array $routes)
+		{
+			static::$routes = $routes;
+		}
+
+		public static function getRoute(string $routeName)
+		{
+			return find_array_values($routeName, static::$routes);
 		}
 	}
