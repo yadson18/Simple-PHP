@@ -158,7 +158,10 @@
 
 		protected function getTitle()
 		{
-			return $this->title;
+			if (isset($this->title)) {
+				return $this->title;
+			}
+			return $this->getTemplate();
 		}
 
 		public function setViewVars(array $viewVars)
