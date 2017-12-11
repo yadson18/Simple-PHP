@@ -31,12 +31,12 @@
 		])
 
 		->set('Databases', [
-			'databaseType' => [
-				'databaseName' => [
+			'Firebird' => [
+				'SRICASH' => [
 					'host' => 'localhost',
-					'path' => 'pathName',
-					'user' => 'root',
-					'password' => 'secret',
+					'path' => '/BD/SRICASH.FDB',
+					'user' => 'SYSDBA',
+					'password' => 'masterkey',
 					'encoding' => 'UTF8'
 				]
 			]
