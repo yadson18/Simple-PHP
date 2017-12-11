@@ -19,14 +19,13 @@
 			$result = $response->result();
 
 			if (!empty($result)) {
-				if ($result->status === 'error') {
-					$result->view->setTitle('Error');
+				if ($result->code !== 200) {
+					$result->view->setTitle('Danied Access');
 					$result->view->setTemplateError('daniedAccess');
 				}
 
 				$result->view->render();
 			}
-
 		}
 
 		public function bootstrap()

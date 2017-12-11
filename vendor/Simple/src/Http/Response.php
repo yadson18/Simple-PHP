@@ -11,9 +11,42 @@
 	{
 		private $request;
 
+		private $code;
+
+		private $status;
+
 		public function __construct(Request $request)
 		{
 			$this->setRequest($request);
+		}
+
+		protected function setStatus(int $code)
+		{
+			switch ($code) {
+				case 200: $this->status = 'success'; break;
+				case 301: $this->status = 'moved permanently'; break;
+				case 400: $this->status = 'bad request'; break;
+				case 401: $this->status = 'unauthorized'; break;
+				case 403: $this->status = 'forbidden'; break;
+				case 404: $this->status = 'not found'; break;
+				case 500: $this->status = 'internal server error'; break;
+			}
+		}
+
+		protected function getStatus()
+		{
+			return $this->status;
+		}
+
+		protected function setCode(int $code)
+		{
+			$this->setStatus($code);
+			$this->code = $code;
+		}
+
+		protected function getCode()
+		{
+			return $this->code;
 		}
 
 		protected function setRequest(Request $request)
@@ -28,57 +61,74 @@
 
 		public function result()
 		{
-			$request = $this->getRequest();
-			$header = (!empty($request->getHeader())) ? $request->getHeader() : null;
-			$controller = (!empty($header)) ? Controller::getNamespace($header->controller) : null;
 			$view = new View();
-			
-			if (!empty($header) && !empty($controller)) {
-				$url = $header->controller . '/' . $header->view;
-				$fullTemplate = TEMPLATE . $header->controller . DS . $header->view . '.php';
-				$reflection = new ReflectionClass($controller);
-				$instance = $reflection->newInstance();
+			$request = $this->getRequest();
 
-				if (call_user_func_array([$instance, 'isAuthorized'], [$header->view]) &&
-					is_callable([$instance, 'initialize']) && 
-					is_callable([$instance, $header->view])
-				) {
-					call_user_func_array([$instance, 'initialize'], [$request, $view]);
-					$result = call_user_func_array([$instance, $header->view], $header->args);
-					
-					if (isset($result['redirect'])) {
-						Router::location($result['redirect']);
-					}
-					else if (is_file($fullTemplate)) {
-						if (isset($instance->Ajax) && 
-							call_user_func([$instance->Ajax, 'notEmptyResponse'])
-						) {
-							$view->setContentType('ajax');
-							$view->setViewVars(call_user_func([$instance->Ajax, 'getResponse']));
+			if (!empty($request->getHeader())) {
+				$header = $request->getHeader();
 
+				if (!empty($header) && !empty(Controller::getNamespace($header->controller))) {
+					$fullTemplate = TEMPLATE . $header->controller . DS . $header->view . '.php';
+					$controller = Controller::getNamespace($header->controller);
+					$reflection = new ReflectionClass($controller);
+					$instance = $reflection->newInstance();
+
+					if (call_user_func_array([$instance, 'isAuthorized'], [$header->view]) &&
+						is_callable([$instance, 'initialize']) && 
+						is_callable([$instance, $header->view])
+					) {	
+						call_user_func_array(
+							[$instance, 'initialize'], [$request, $view]
+						);
+						$result = call_user_func_array(
+							[$instance, $header->view], $header->args
+						);
+
+						if (isset($result['redirect'])) {
+							Router::location($result['redirect']);
+						}
+						else if (is_file($fullTemplate)) {
+							if (isset($instance->Ajax) && 
+								call_user_func([$instance->Ajax, 'notEmptyResponse'])
+							) {
+								$view->setContentType('ajax');
+								$view->setViewVars(call_user_func([$instance->Ajax, 'getResponse']));
+
+							}
+							else {
+								$view->setContentType('default');
+							}
+
+							$view->setComponents($instance->getComponents());
+							$view->setControllerName($header->controller);
+							$view->setTemplatePath(TEMPLATE . $header->controller . DS);
+							$view->setTemplate($header->view);	
+							$this->setCode(200);
 						}
 						else {
-							$view->setContentType('default');
+							$this->setCode(404);
 						}
-
-						$view->setComponents($instance->getComponents());
-						$view->setControllerName($header->controller);
-						$view->setTemplatePath(TEMPLATE . $header->controller . DS);
-						$view->setTemplate($header->view);
-
-						return (object) [
-							'status' => 'success',
-							'view' => $view
-						];
 					}
-					
+					else {
+						$this->setCode(403);
+					}
+				}
+				else {
+					$this->setCode(400);
 				}
 			}
-			$view->setContentType('error');
-			$view->setTemplatePath(TEMPLATE . 'Error' . DS);
+			else {
+				$this->setCode(400);
+			}
+
+			if ($this->getCode() !== 200) {
+				$view->setContentType('error');
+				$view->setTemplatePath(TEMPLATE . 'Error' . DS);
+			}
 
 			return (object) [
-				'status' => 'error',
+				'code' => $this->getCode(),
+				'status' => $this->getStatus(),
 				'view' => $view
 			];
 		}

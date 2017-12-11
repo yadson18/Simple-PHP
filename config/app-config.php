@@ -10,8 +10,7 @@
 			'displayErrors' => true,
 			'encoding' => 'utf-8',
 			'timezone' => 'UTC',
-			'locate' => 'pt-Br',
-			'errorPage' => 'danied-access.php'
+			'locate' => 'pt-Br'
 		])
 
 		->set('Routes', [
