@@ -6,7 +6,7 @@
 	$config
 	
 		->set('App', [
-			'name' => 'Application Name - ',
+			'name' => 'Simple - ',
 			'displayErrors' => true,
 			'encoding' => 'utf-8',
 			'timezone' => 'UTC',
