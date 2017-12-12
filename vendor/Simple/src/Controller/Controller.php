@@ -1,11 +1,19 @@
 <?php 
 	namespace Simple\Controller;
 
+	use Simple\Controller\Interfaces\ControllerInterface;
+	use Simple\Controller\Component;
+	use Simple\ORM\TableRegistry;
 	use Simple\Http\Request;
+	use Simple\ORM\Table;
 	use Simple\View\View;
 
-	abstract class Controller implements Interfaces\ControllerInterface
+	abstract class Controller implements ControllerInterface
 	{
+		const NAMESPACE = 'App\\Controller\\';
+
+		const SUFIX = 'Controller';
+
 		public $Request;
 
 		private $view;
@@ -14,11 +22,24 @@
 
 		public function initialize(Request $request, View $view)
 		{
+			$this->component = new Component();
+			
 			$this->Request = $request;
 			
 			$this->view = $view;
-			
-			$this->component = new Component();
+
+			$this->loadTables();
+		}
+
+		protected function loadTables()
+		{
+			$namespace = splitNamespace(get_class($this));
+			$tableName = str_replace('Controller', '', array_pop($namespace));
+			$table = TableRegistry::get($tableName);
+
+			if (!empty($table)) {
+				$this->$tableName = $table;
+			}
 		}
 
 		protected function loadComponent(string $componentName)
@@ -61,9 +82,17 @@
         	return false;
 		}
 
+		public static function exists(string $controllerName)
+		{
+			if (class_exists(Controller::NAMESPACE . $controllerName . Controller::SUFIX)) {
+				return true;
+			}
+			return false;
+		}
+
 		public static function getNamespace(string $controllerName)
 		{
-			$controller = 'App\\Controller\\' . $controllerName . 'Controller';
+			$controller = Controller::NAMESPACE . $controllerName . Controller::SUFIX;
 
 			if (class_exists($controller)) {
 				return $controller;

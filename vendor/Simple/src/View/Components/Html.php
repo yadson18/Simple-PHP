@@ -3,31 +3,52 @@
     
     class Html
     {
+        private static $tags = [
+            'meta' => '<meta charset="%encode%"/>',
+            'link' => '<link rel="stylesheet/%type%" type="text/css" href="%href%"/>',
+            'script' => '<script type="text/javascript" src="/js/%script%"></script>'
+        ];
+
         private static $encode;
 
         public function encoding()
         {
-            return '<meta charset="' . static::$encode . '"/>';
+            return $this->replaceProperties('meta', ['%encode%' => static::$encode]);
         }
 
         public function css(string $cssName)
         {
             if (is_file(CSS . $cssName)) {
-      		    return '<link rel="stylesheet" type="text/css" href="/css/' . $cssName . '"/>';
+                return $this->replaceProperties('link', [
+                    '%href%' => '/css/' . $cssName,
+                    '/%type%' => ''
+                ]);
             }
     	}
 
         public function script(string $scriptName)
         {
             if (is_file(JS . $scriptName)) {
-                return '<script type="text/javascript" src="/js/' . $scriptName . '"></script>';
+                return $this->replaceProperties('script', [
+                    '%script%' => $scriptName
+                ]);
             }
         }
 
         public function less(string $lessName)
         {
             if (is_file(LESS . $lessName)) {
-                return '<link rel="stylesheet/less" type="text/css" href="/less/' . $lessName . '"/>';
+                return $this->replaceProperties('link', [
+                    '%href%' => '/less/' . $lessName,
+                    '%type%' => 'less'
+                ]);
+            }
+        }
+
+        protected function replaceProperties(string $tag, array $properties)
+        {
+            if (isset(static::$tags[$tag])) {
+                return replaceRecursive(static::$tags[$tag], $properties);
             }
         }
 

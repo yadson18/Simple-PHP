@@ -2,7 +2,7 @@
 	namespace Simple\Mailer;
 
 	use Simple\Configurator\Configurator;
-	use Simple\Mailer\Component\PHPMailer;
+	use Simple\Mailer\Components\PHPMailer;
 
 	class Email
 	{

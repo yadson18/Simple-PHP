@@ -23,12 +23,14 @@
 	$config->displayErrors($config->use('App.displayErrors'));
 
 
+	use Simple\Http\Integrator\Webservice;
 	use Simple\Application\Application;
 	use Simple\View\Components\Html;
 	use Simple\Database\Driver; 
 	use Simple\Routing\Router;
 
 	Application::configAppName($config->use('App.name'));
+	Webservice::configOptions($config->use('Webservice'));
 	Driver::configDrivers($config->use('Databases'));
 	Html::configEncode($config->use('App.encoding'));
 	Router::configRoutes($config->use('Routes'));

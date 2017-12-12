@@ -1,5 +1,5 @@
 <?php
-    namespace Simple\Mailer\Component;
+    namespace Simple\Mailer\Components;
 /**
  * PHPMailer POP-Before-SMTP Authentication Class.
  * PHP Version 5.5.

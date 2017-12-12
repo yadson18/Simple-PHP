@@ -1,5 +1,5 @@
 <?php
-    namespace Simple\Mailer\Component;
+    namespace Simple\Mailer\Components;
 /**
  * PHPMailer - PHP email creation and transport class.
  * PHP Version 5.5.

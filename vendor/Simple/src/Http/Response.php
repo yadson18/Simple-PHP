@@ -3,6 +3,7 @@
 
 	use Simple\Controller\Controller;
 	use Simple\Routing\Router;
+	use Simple\Http\Request;
 	use Simple\View\View;
 	use ReflectionClass;
 	use stdClass;
@@ -67,39 +68,39 @@
 			if (!empty($request->getHeader())) {
 				$header = $request->getHeader();
 
-				if (!empty($header) && !empty(Controller::getNamespace($header->controller))) {
+				if (!empty($header) && Controller::exists($header->controller)) {
 					$fullTemplate = TEMPLATE . $header->controller . DS . $header->view . '.php';
-					$controller = Controller::getNamespace($header->controller);
-					$reflection = new ReflectionClass($controller);
-					$instance = $reflection->newInstance();
+					$controllerName = Controller::getNamespace($header->controller);
+					$reflection = new ReflectionClass($controllerName);
+					$controller = $reflection->newInstance();
 
-					if (call_user_func_array([$instance, 'isAuthorized'], [$header->view]) &&
-						is_callable([$instance, 'initialize']) && 
-						is_callable([$instance, $header->view])
+					if (call_user_func_array([$controller, 'isAuthorized'], [$header->view]) &&
+						is_callable([$controller, 'initialize']) && 
+						is_callable([$controller, $header->view])
 					) {	
 						call_user_func_array(
-							[$instance, 'initialize'], [$request, $view]
+							[$controller, 'initialize'], [$request, $view]
 						);
 						$result = call_user_func_array(
-							[$instance, $header->view], $header->args
+							[$controller, $header->view], $header->args
 						);
 
 						if (isset($result['redirect'])) {
 							Router::location($result['redirect']);
 						}
 						else if (is_file($fullTemplate)) {
-							if (isset($instance->Ajax) && 
-								call_user_func([$instance->Ajax, 'notEmptyResponse'])
+							if (isset($controller->Ajax) && 
+								call_user_func([$controller->Ajax, 'notEmptyResponse'])
 							) {
 								$view->setContentType('ajax');
-								$view->setViewVars(call_user_func([$instance->Ajax, 'getResponse']));
+								$view->setViewVars(call_user_func([$controller->Ajax, 'getResponse']));
 
 							}
 							else {
 								$view->setContentType('default');
 							}
 
-							$view->setComponents($instance->getComponents());
+							$view->setComponents($controller->getComponents());
 							$view->setControllerName($header->controller);
 							$view->setTemplatePath(TEMPLATE . $header->controller . DS);
 							$view->setTemplate($header->view);	

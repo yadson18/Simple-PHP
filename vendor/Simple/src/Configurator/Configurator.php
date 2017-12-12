@@ -1,6 +1,8 @@
 <?php 
 	namespace Simple\Configurator;
 
+	use Simple\Configurator\PhpConfig;
+
 	class Configurator extends PhpConfig
 	{
 		private static $Instance;

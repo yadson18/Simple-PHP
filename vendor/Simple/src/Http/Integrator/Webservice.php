@@ -1,40 +1,57 @@
 <?php
-    namespace Simple\Webservice;
+    namespace Simple\Http\Integrator;
     
+    use SoapClient;
+
     class Webservice
     {
-        private static $Instance;
-        private $Connection;
+        private static $instance;
+        private static $configurations;
+        private $connection;
 
-        private function __construct(array $webserviceConfig)
+        private function __construct(){}
+
+        public function connect()
         {
-            $this->Error = new ErrorHandling("Webservice");
+            if (isset(static::$configurations['url']) &&
+                isset(static::$configurations['configs'])
+            ) {
+                try {
+                    $this->connection = new SoapClient(
+                        static::$configurations['url'], static::$configurations['configs']
+                    );
 
-            try {
-                if (!isset($this->Connection)) {
-                    $this->Connection = new SoapClient($webserviceConfig["url"], $webserviceConfig["options"]);
+                    if (isset($this->connection)) {
+                        return true;
+                    }
+                } 
+                catch (Exception $Exception) {
+                    return false;
                 }
-            } 
-            catch (Exception $Exception) {
-                $this->Error->stopExecution(
-                    $Exception->getCode(), $Exception->getMessage(), 11
-                );
             }
+            return false;
         }
         
         public static function getInstance()
         {
-            if (!isset(self::$Instance)) {
-                self::$Instance = new Webservice(getWebServiceConfig());
+            if (!isset(static::$instance)) {
+                static::$instance = new Webservice();
             }
-            return self::$Instance;
+            return static::$instance;
         }
 
-        public function callFunction($functionName, $arguments)
+        public function callFunction(string $functionName, $arguments)
         {
-            if (is_callable([$this->Connection, $functionName], true)) {
-                return $this->Connection->$functionName($arguments);
+            if (is_callable([$this->connection, $functionName])) {
+                return call_user_func_array(
+                    [$this->connection, $functionName], [$arguments]
+                );
             }
             return false;
+        }
+
+        public static function configOptions(array $configs)
+        {
+            static::$configurations = $configs;
         }
     }

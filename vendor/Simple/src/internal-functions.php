@@ -13,6 +13,20 @@
 
 	}
 
+	function replaceRecursive(string $value, array $replaces)
+	{
+		while ($replaces) {
+			$value = replace($value, key($replaces), array_shift($replaces));
+		}
+
+		return $value;
+	}
+
+	function replace(string $value, string $search, string $replace)
+	{
+		return str_replace($search, $replace, $value);
+	}
+
 	function find_array_values(string $keys, array $array)
 	{
 		return array_deep_search(explode('.', $keys), $array);
@@ -23,6 +37,11 @@
 		echo "<pre id='debug-screen'>";
 		var_dump($data);
 		echo "</pre>";
+	}
+
+	function splitNamespace(string $namespace)
+	{
+		return explode('\\', $namespace);
 	}
 
 	function removeSpecialChars($string) 

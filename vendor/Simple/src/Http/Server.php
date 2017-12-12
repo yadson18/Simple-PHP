@@ -2,6 +2,7 @@
 	namespace Simple\Http;
 
 	use Simple\Application\Application;
+	use Simple\Http\Request;
 
 	class Server
 	{

@@ -43,7 +43,7 @@
 		])
 
 		->set('Webservice', [
-			'url' => "example.com/soap",
+			'url' => "http://examplews.com/soap",
 			'configs' => [
 				'soap_version' => 'SOAP_1_2',
                 'exceptions' => true,
