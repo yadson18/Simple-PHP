@@ -99,7 +99,7 @@
 
 		public function is(string $requestMethod)
 		{
-			if ($this->getRequestMethod() === $requestMethod) {
+			if ($this->getMethod() === $requestMethod) {
 				return true;
 			}
 			return false;
