@@ -24,17 +24,11 @@
 
 
 	use Simple\Application\Application;
+	use Simple\View\Components\Html;
 	use Simple\Database\Driver; 
 	use Simple\Routing\Router;
-	use Simple\Html\Html;
-	/*use Simple\Database\Database;
-	use Simple\Mailer\Email;*/
-	/*use Simple\Http\Integrator\Webservice;*/
 
 	Application::configAppName($config->use('App.name'));
 	Driver::configDrivers($config->use('Databases'));
 	Html::configEncode($config->use('App.encoding'));
 	Router::configRoutes($config->use('Routes'));
-	/*Database::configDatabase($config->use('Databases'));
-	Email::configEmail($config->use('Email.default'));*/
-	/*Webservice::configConnection($config->use('Webservice'));*/

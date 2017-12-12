@@ -1,20 +1,20 @@
 <?php 
 	namespace Simple\View;
 
-	use Simple\Html\Html;
-	use Simple\Html\Form;
+	use Simple\View\Components\Html;
+	use Simple\View\Components\Form;
 
 	class View
 	{
 		const LAYOUT = TEMPLATE . 'Layout' . DS;
 
-		const EXT = '.php';
-
-		const AJAX = 'ajax' . View::EXT;
-
-		const ERROR = 'error' . View::EXT;
-
 		const DEFAULT = 'default' . View::EXT;
+		
+		const ERROR = 'error' . View::EXT;
+		
+		const AJAX = 'ajax' . View::EXT;
+		
+		const EXT = '.php';
 
 		private $contentType;
 

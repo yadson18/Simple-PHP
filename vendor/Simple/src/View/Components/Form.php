@@ -1,5 +1,5 @@
 <?php
-    namespace Simple\Html;
+    namespace Simple\View\Components;
     
     class Form
     {
