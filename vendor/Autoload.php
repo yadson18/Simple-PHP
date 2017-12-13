@@ -4,8 +4,8 @@
 		public static function loadNamespaces()
 		{
             spl_autoload_register( function($namespace) {
-            	self::fromVendorDir($namespace);
-            	self::fromAppDir($namespace);
+            	static::fromVendorDir($namespace);
+            	static::fromAppDir($namespace);
             });
         }
 
@@ -28,11 +28,11 @@
 
         protected function fromVendorDir($namespace)
         {
-        	self::config('Simple\\', SIMPLE, $namespace);
+        	static::config('Simple\\', SIMPLE, $namespace);
         }
 
         protected function fromAppDir($namespace)
         {
-        	self::config('App\\', APP, $namespace);
+        	static::config('App\\', APP, $namespace);
         }
 	}

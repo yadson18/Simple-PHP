@@ -52,13 +52,13 @@ FROM PRIMARY_KEY
 UNION ALL
 
 SELECT REPLACE(
-    '$validator->addRule("' || COLUMNS || '")->' || 
+    '$validator->addRule(''' || COLUMNS || ''')->' || 
     IS_NULL || '()->' ||
     TYPE || '()->' ||
     'size(' || SIZE || ')->' ||
     CASE 
-        WHEN DEFAULT_VALUE IS NULL THEN 'defaultValue("");'
-        ELSE 'defaultValue(' || REPLACE(REPLACE(DEFAULT_VALUE, 'DEFAULT', ''), '''', '"') || ');'
+        WHEN DEFAULT_VALUE IS NULL THEN 'defaultValue('''');'
+        ELSE 'defaultValue(' || REPLACE(REPLACE(DEFAULT_VALUE, 'DEFAULT', ''), '''', '''') || ');'
     END, ' ', ''
 ) AS METHODS
 FROM VALIDATOR_METHOD;
