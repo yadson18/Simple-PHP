@@ -31,7 +31,7 @@
 			}
 		}
 
-		protected function database(string $databaseType, string $databaseName)
+		protected function setDatabase(string $databaseType, string $databaseName)
 		{
 			$this->setDatabaseType($databaseType);
 			$this->setDatabaseName($databaseName);

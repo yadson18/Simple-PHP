@@ -7,7 +7,7 @@
 	{
 		public function initialize()
 		{
-			$this->database('Firebird', 'SRICASH');
+			$this->setDatabase('Firebird', 'SRICASH');
 
 			$this->setTable('Page');
 

@@ -1,6 +1,8 @@
 <?php 
 	namespace App\Controller;
 
+	use Simple\ORM\TableRegistry;
+
 	class PageController extends AppController
 	{
 		public function isAuthorized(string $method)
