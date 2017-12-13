@@ -5,7 +5,6 @@
 	use Simple\Controller\Component;
 	use Simple\ORM\TableRegistry;
 	use Simple\Http\Request;
-	use Simple\ORM\Table;
 	use Simple\View\View;
 
 	abstract class Controller implements ControllerInterface
@@ -79,23 +78,5 @@
         		return ['redirect' => $route];
         	}
         	return false;
-		}
-
-		public static function exists(string $controllerName)
-		{
-			if (class_exists(Controller::NAMESPACE . $controllerName . Controller::SUFIX)) {
-				return true;
-			}
-			return false;
-		}
-
-		public static function getNamespace(string $controllerName)
-		{
-			$controller = Controller::NAMESPACE . $controllerName . Controller::SUFIX;
-
-			if (class_exists($controller)) {
-				return $controller;
-			}
-			return false;
 		}
 	}

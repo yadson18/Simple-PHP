@@ -1,11 +1,10 @@
 <?php 
 	namespace Simple\Http;
 
-	use Simple\Controller\Controller;
 	use Simple\Routing\Router;
 	use Simple\Http\Request;
+	use Simple\Util\Builder;
 	use Simple\View\View;
-	use ReflectionClass;
 	use stdClass;
 
 	class Response
@@ -62,47 +61,41 @@
 
 		public function result()
 		{
+			$header = $this->getRequest()->getHeader();
 			$view = new View();
-			$request = $this->getRequest();
 
-			if (!empty($request->getHeader())) {
-				$header = $request->getHeader();
+			if (!empty($header) && isset($header->controller)) {
+				$controller = new Builder('App\\Controller\\' . $header->controller . 'Controller');
 
-				if (!empty($header) && Controller::exists($header->controller)) {
-					$fullTemplate = TEMPLATE . $header->controller . DS . $header->view . '.php';
-					$controllerName = Controller::getNamespace($header->controller);
-					$reflection = new ReflectionClass($controllerName);
-					$controller = $reflection->newInstance();
-
-					if (call_user_func_array([$controller, 'isAuthorized'], [$header->view]) &&
-						is_callable([$controller, 'initialize']) && 
-						is_callable([$controller, $header->view])
-					) {	
-						call_user_func_array(
-							[$controller, 'initialize'], [$request, $view]
-						);
-						$result = call_user_func_array(
-							[$controller, $header->view], $header->args
-						);
+				if ($controller->invoke('isAuthorized', [$header->view])) {
+					if ($controller->canInvokeMethod('initialize') &&
+						$controller->canInvokeMethod($header->view)
+					) {
+						$controller->invoke('initialize', [$this->getRequest(), $view]);
+						$result = $controller->invoke($header->view, $header->args);
+						$templatePath = TEMPLATE . $header->controller . DS;
 
 						if (isset($result['redirect'])) {
 							Router::location($result['redirect']);
 						}
-						else if (is_file($fullTemplate)) {
-							if (isset($controller->Ajax) && 
-								call_user_func([$controller->Ajax, 'notEmptyResponse'])
+						else if (is_file($templatePath . $header->view . '.php')) {
+							if ($controller->canUseAttribute('Ajax') &&
+								call_user_func([
+									$controller->useAttribute('Ajax'), 'notEmptyResponse'
+								])
 							) {
 								$view->setContentType('ajax');
-								$view->setViewVars(call_user_func([$controller->Ajax, 'getResponse']));
-
+								$view->setViewVars(call_user_func([
+									$controller->useAttribute('Ajax'), 'getResponse'
+								]));
 							}
 							else {
 								$view->setContentType('default');
 							}
 
-							$view->setComponents($controller->getComponents());
+							$view->setComponents($controller->invoke('getComponents'));
 							$view->setControllerName($header->controller);
-							$view->setTemplatePath(TEMPLATE . $header->controller . DS);
+							$view->setTemplatePath($templatePath);
 							$view->setTemplate($header->view);	
 							$this->setCode(200);
 						}
@@ -111,15 +104,15 @@
 						}
 					}
 					else {
-						$this->setCode(403);
+						$this->setCode(400);
 					}
 				}
 				else {
-					$this->setCode(400);
+					$this->setCode(401);
 				}
 			}
 			else {
-				$this->setCode(400);
+				$this->setCode(500);
 			}
 
 			if ($this->getCode() !== 200) {

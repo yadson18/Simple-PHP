@@ -1,7 +1,7 @@
 <?php
 	namespace Simple\ORM;
 	
-	use ReflectionClass;
+	use Simple\Util\Builder;
 
 	abstract class Table
 	{
@@ -20,13 +20,9 @@
 		public function newEntity()
 		{
 			$entityName = replace(splitNamespace(get_class($this)), 'Table', '');
-			$entityName = Table::ENTITY_NAMESPACE . $entityName;
+			$entity = new Builder(Table::ENTITY_NAMESPACE . $entityName);
 
-			if (class_exists($entityName)) {
-				$entity = new ReflectionClass($entityName);
-
-				return $entity->newInstance();
-			}
+			return $entity->getBuiltInstance();
 		}
 
 		protected function setDatabase(string $databaseType, string $databaseName)

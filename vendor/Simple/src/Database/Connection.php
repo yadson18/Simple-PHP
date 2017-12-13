@@ -2,36 +2,53 @@
 	namespace Simple\Database;
 
 	use Simple\Database\Driver;
+	use PDO;
 
 	class Connection
 	{
-		private $driver;
+		private $currentDriver;
+
+		private $connection;
 
 		public function __construct(string $driverName)
 		{
-			$this->setDriver($driverName);
+			$this->setCurrentDriver(new Driver($driverName));
 		}
-
-		protected function setDriver(string $driverName)
+		
+		public function connectDatabase(string $databaseName)
 		{
-			$driver = new Driver($driverName);
+			if (is_callable([$this->getCurrentDriver(), 'connect'])) {
+				$connection = $this->getCurrentDriver()->connect($databaseName);
 
-			if (!empty($driver)) {
-				$this->driver = $driver->getDriver();
+				if ($connection) {
+					$this->setConnection($connection);
+				}
 			}
 		}
 
-		protected function getDriver()
+		public function on()
 		{
-			if (isset($this->driver)) {
-				return $this->driver;
+			if ($this->getConnection()) {
+				return true;
 			}
+			return false;
 		}
 
-		public function connectInto(string $databaseName)
+		protected function setConnection(PDO $connection){
+			$this->connection = $connection;
+		}
+
+		public function getConnection(){
+			return $this->connection;
+		}
+
+		protected function setCurrentDriver(Driver $driver)
 		{
-			if ($this->getDriver()) {
-				return $this->getDriver()->connect($databaseName);
-			}
+			$this->currentDriver = $driver->use();
+		}
+
+		protected function getCurrentDriver()
+		{
+			return $this->currentDriver;
 		}
 	}

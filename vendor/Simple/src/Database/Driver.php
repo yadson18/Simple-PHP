@@ -1,7 +1,7 @@
 <?php 
 	namespace Simple\Database; 
 
-	use ReflectionClass;
+	use Simple\Util\Builder;
 
 	class Driver
 	{
@@ -18,30 +18,18 @@
 
 		protected function setDriver(string $driverName)
 		{
-			if ($this->canBeUsed($driverName)) {
-				$reflection = new ReflectionClass(Driver::NAMESPACE . $driverName);
-					
-				$this->driver = $reflection->newInstance(
-					find_array_values($driverName, static::$driversConfigs)
-				);
+			$driverConfig = find_array_values($driverName, static::$driversConfigs);
+
+			if (!empty($driverConfig)) {
+				$driver = new Builder(Driver::NAMESPACE . $driverName, [$driverConfig]);
+
+				$this->driver = $driver->getBuiltInstance();
 			}
 		}
 
-		public function getDriver()
+		public function use()
 		{
 			return $this->driver;
-		}
-
-		protected function canBeUsed(string $driverName)
-		{
-			$driver = Driver::NAMESPACE . $driverName;
-
-			if (class_exists($driver) &&
-				find_array_values($driverName, static::$driversConfigs)
-			) {
-				return true;
-			}
-			return false;
 		}
 
 		public static function configDrivers(array $driversConfigs)

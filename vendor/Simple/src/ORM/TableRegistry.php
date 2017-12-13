@@ -1,8 +1,7 @@
 <?php 
 	namespace Simple\ORM;
 
-	use ReflectionClass;
-	use ReflectionMethod;
+	use Simple\Util\Builder;
 
 	abstract class TableRegistry
 	{
@@ -17,18 +16,12 @@
 
 		protected function getTableInstance(string $tableName)
 		{
-			$tableName = TableRegistry::NAMESPACE . $tableName . TableRegistry::SUFIX;
+			$table = new Builder(TableRegistry::NAMESPACE . $tableName . TableRegistry::SUFIX);
 
-			if (class_exists($tableName)) {
-				$reflectionTable = new ReflectionClass($tableName);
-				$table = $reflectionTable->newInstance();
-				
-				if (is_callable([$table, 'initialize'])) {
-					$reflectionMethod = new ReflectionMethod($tableName, 'initialize');
-					$reflectionMethod->invoke($table);
+			if ($table->canInvokeMethod('initialize')) {
+				$table->invoke('initialize');
 
-					return $table;
-				}
-			}
+				return $table->getBuiltInstance();
+            }
 		}
 	}
