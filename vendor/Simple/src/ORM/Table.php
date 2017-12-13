@@ -19,9 +19,7 @@
 
 		public function newEntity()
 		{
-			$namespace = splitNamespace(get_class($this));
-			$entityName = str_replace('Table', '', array_pop($namespace));
-
+			$entityName = replace(splitNamespace(get_class($this)), 'Table', '');
 			$entityName = Table::ENTITY_NAMESPACE . $entityName;
 
 			if (class_exists($entityName)) {

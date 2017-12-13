@@ -13,6 +13,18 @@
 
 	}
 
+	function splitNamespace(string $namespace)
+	{
+		$pieces = explode('\\', $namespace);
+
+		if (is_array($pieces)) {
+			$result = array_pop($pieces);
+
+			return (!empty($result)) ? $result : array_pop($pieces);
+		}
+		return $pieces;
+	}
+
 	function replaceRecursive(string $value, array $replaces)
 	{
 		while ($replaces) {
@@ -37,11 +49,6 @@
 		echo "<pre id='debug-screen'>";
 		var_dump($data);
 		echo "</pre>";
-	}
-
-	function splitNamespace(string $namespace)
-	{
-		return explode('\\', $namespace);
 	}
 
 	function removeSpecialChars($string) 

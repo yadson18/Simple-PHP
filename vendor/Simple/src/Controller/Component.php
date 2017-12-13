@@ -5,13 +5,13 @@
 
 	class Component
 	{
-		private $componentsRegistry = [];
-
-		private $componentName;
-
 		const NAMESPACE = 'Simple\\Controller\\Components\\';
 
 		const SUFIX = 'Component';
+
+		private $componentsRegistry = [];
+
+		private $componentName;
 
 		public function register(string $componentName)
 		{

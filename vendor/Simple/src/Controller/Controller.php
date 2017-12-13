@@ -33,8 +33,7 @@
 
 		protected function loadTables()
 		{
-			$namespace = splitNamespace(get_class($this));
-			$tableName = str_replace('Controller', '', array_pop($namespace));
+			$tableName = replace(splitNamespace(get_class($this)), 'Controller', '');
 			$table = TableRegistry::get($tableName);
 
 			if (!empty($table)) {

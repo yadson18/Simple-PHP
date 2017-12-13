@@ -17,14 +17,14 @@
 
 		protected function getTableInstance(string $tableName)
 		{
-			$tableNamespace = TableRegistry::NAMESPACE . $tableName . TableRegistry::SUFIX;
+			$tableName = TableRegistry::NAMESPACE . $tableName . TableRegistry::SUFIX;
 
-			if (class_exists($tableNamespace)) {
-				$reflectionTable = new ReflectionClass($tableNamespace);
+			if (class_exists($tableName)) {
+				$reflectionTable = new ReflectionClass($tableName);
 				$table = $reflectionTable->newInstance();
 				
 				if (is_callable([$table, 'initialize'])) {
-					$reflectionMethod = new ReflectionMethod($tableNamespace, 'initialize');
+					$reflectionMethod = new ReflectionMethod($tableName, 'initialize');
 					$reflectionMethod->invoke($table);
 
 					return $table;
