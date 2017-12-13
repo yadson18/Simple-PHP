@@ -1,17 +1,20 @@
 <?php  
-	namespace Model\Tables;
+	namespace App\Model\Table;
+
+	use Simple\Validation\Validator;
+	use Simple\ORM\Table;
 
 	class %table_name%Table extends Table
 	{
 		public function initialize()
 		{
-			parent::database("%db_type%", "%db_name%");
+			$this->setDatabase("%db_type%", "%db_name%");
 
-			$this->table("%table%");
+			$this->setTable("%table%");
 
-			$this->primaryKey("%primary_key%");
+			$this->setPrimaryKey("%primary_key%");
 
-			$this->belongsTo("", []);
+			$this->setBelongsTo("", []);
 		}
 
 		public function defaultValidator(Validator $validator)

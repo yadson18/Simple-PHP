@@ -90,7 +90,7 @@ function makeClassTable(){
 				primaryKeys="";
 			fi
 
-			table=$(sed -e "s/%table_name%/$className/g" -e "s/%table_attributes%/$tableAttributes/g" -e "s/%db_type%/$databaseType/g" -e "s/%db_name%/$databaseName/g" -e "s/%table%/$tableName/g" -e "s/%primary_key%/$primaryKeys/g" $TEMPLATES_PATH/Table.php > $MODEL_PATH/Tables/$className'Table.php');
+			table=$(sed -e "s/%table_name%/$className/g" -e "s/%table_attributes%/$tableAttributes/g" -e "s/%db_type%/$databaseType/g" -e "s/%db_name%/$databaseName/g" -e "s/%table%/$tableName/g" -e "s/%primary_key%/$primaryKeys/g" $TEMPLATES_PATH/Table.php > $MODEL_PATH/Table/$className'Table.php');
 			
 			if [ $? -ne 1 ]; then
 				echo 1;
