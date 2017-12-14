@@ -27,7 +27,7 @@
 			}
 		}
 
-		public function use()
+		public function getDriver()
 		{
 			return $this->driver;
 		}

@@ -5,52 +5,41 @@
 
 	class Query
 	{
+		private static $queries = [
+			'insert' => 'INSERT INTO %tables% (%columnsString%) VALUES(%values%)',
+			'select' => 'SELECT %columns% FROM %tables%',
+			'update' => 'UPDATE %tables% SET %columnsFormated%',
+			'delete' => 'DELETE FROM %tables%',
+			'where' => 'WHERE %condition%',
+			'order by' => 'ORDER BY %order%'
+		];
+		
 		private $connection;
 
 		private $type = 'select';
 
 		private $parts = [
+			'insert' => [],
 			'select' => [],
 			'update' => [],
-			'delete' => [],
-			'insert' => []
+			'delete' => []
 		];
 
-		protected function mountQuery()
+		private $values = [];
+
+		public function __construct(string $databaseType, string $databaseName)
 		{
-			$query = '';
-			$values = [];
+			$this->setConnection(new Connection($databaseType, $databaseName));
+		}
 
-			while ($this->parts[$this->type]) {
-				$query .= ' ' . key($this->parts[$this->type]);
-				$partQuery = array_shift($this->parts[$this->type]);
+		protected function setConnection(Connection $connection)
+		{
+			$this->connection = $connection->getConnection();
+		}
 
-				if (is_array($partQuery)) {
-					while ($partQuery) {
-						$column = (is_string(key($partQuery))) ? key($partQuery) . ' ' : '';
-						$value = array_shift($partQuery);
-
-						if ($column) {
-							if ($this->type === 'select') {
-								$query .= ' ' . $column . '?';
-								$values[] = $value;
-							}
-							else {
-								$query .= ' ' . $column . ' :' . $column;
-								$values[$column] = $value;
-							}
-						}
-						else {
-							$query .= ' ' . $value;
-						}
-					}
-				}
-				else {
-					$query .= ' ' . $partQuery;
-				}
-			}
-
-			return $query;
+		protected function getConnection()
+		{
+			return $this->connection;
 		}
 
 		public function getAll()
@@ -58,39 +47,42 @@
 			return $this->mountQuery();
 		}
 
-		public function __construct(string $databaseType, string $databaseName)
+		public function insert(array $dataToInsert)
 		{
-			$this->setConnection(new Connection($databaseType), $databaseName);
+			$this->setQueryType('insert');
+			$this->setData('columnsString', $dataToInsert);
+
+			return $this;
 		}
 
 		public function select(string $fields)
 		{
-			$this->parts['update']['select'] = $fields;
+			$this->setQueryType('select');
+			$this->setData('columns', $fields);
+
+			return $this;
+		}
+
+		public function update(array $dataToUpdate)
+		{
 			$this->setQueryType('update');
+			$this->setData('columnsFormated', $dataToUpdate);
 
 			return $this;
 		}
 
 		public function from(string $tables)
 		{
-			$this->parts[$this->type]['from'] = $tables;
-
+			$this->setData('tables', $tables);
+			
 			return $this;
 		}
 
 		public function where(array $condition)
 		{
-			$this->parts[$this->type]['where'] = $condition;
+			$this->setData('where', $condition);
 
 			return $this;
-		}
-
-		protected function checkQueryType(array $types)
-		{
-			if (in_array($this->getQueryType(), $types)) {
-				return true;
-			}
-			return false;
 		}
 
 		protected function getQueryType()
@@ -103,17 +95,106 @@
 			$this->type = $type;
 		}
 
-		protected function setConnection(Connection $connection, string $databaseName)
+		protected function separateColAndVal(array $arrayColAndVal)
 		{
-			$connection->connectDatabase($databaseName);
+			$stringColumns = '';
+			$values = [];
 
-			if ($connection->on()) {
-				$this->connection = $connection->getConnection();
+			while ($arrayColAndVal) {
+				$column = key($arrayColAndVal);
+				$value = array_shift($arrayColAndVal);
+
+				if (is_string($column)) {
+					if ($this->getQueryType() === 'select') {
+						$stringColumns .= ' ' . $column . ' ?';
+						$values[] = $value;
+					}
+					else {
+						$columnRemoveSignal = strstr($column, ' ', true); 
+
+						if ($columnRemoveSignal) {
+							$stringColumns .= ' ,' . $column . ' :' . $columnRemoveSignal;
+							$values[$columnRemoveSignal] = $value;
+						}	
+					}
+				}
+				else {
+					$stringColumns .= ' ' . $value;
+				}
+			}
+
+			if (!empty($stringColumns) && !empty($values)) {
+				return [
+					'columns' => $stringColumns,
+					'values' => $values
+				];
+			}
+			return false;
+		}
+
+		protected function mountQuery()
+		{
+			if (isset(static::$queries[$this->getQueryType()]) &&
+				isset($this->parts[$this->getQueryType()])
+			) {
+				$query = static::$queries[$this->getQueryType()];
+				$queryData = $this->parts[$this->getQueryType()];
+
+				while ($queryData) {
+					$column = key($queryData);
+					$value = array_shift($queryData);
+
+					if (isset(static::$queries[$column])) {
+						$clause = static::$queries[$column];
+
+						if ($column === 'where') {
+							$query .= ' ' . replace($clause, '%condition%', $value);
+						}
+					}
+					else {
+						$query = replace($query, '%' . $column . '%', $value);
+					}
+				}
+
+				return [
+					'query' => $query,
+					'values' => $this->values
+				];
 			}
 		}
 
-		protected function getConnection()
+		protected function setData(string $index, $value)
 		{
-			return $this->connection;
+			if (!isset($this->parts[$this->getQueryType()][$index]) &&
+				!empty($value)
+			) {
+				if (is_array($value)) {
+					$data = $this->separateColAndVal($value);
+					
+					if ($data) {
+						switch ($index) {
+							case 'columnsFormated':
+								$valueToSet = substr($data['columns'], 2);
+							break;
+							case 'where':
+								$valueToSet = substr(replace($data['columns'], ',', ''), 1);
+							break;
+							case 'columnsString':
+								$valueToSet = substr(replace($data['columns'], ',', ''), 1);
+							break;
+						}
+						$this->parts[$this->getQueryType()][$index] = $valueToSet;
+						$this->values = array_merge($data['values']);
+
+						return true;
+					}
+				}
+				else {
+					$this->parts[$this->getQueryType()][$index] = $value;
+
+					return true;
+				}
+			}
+			return false;
 		}
 	}

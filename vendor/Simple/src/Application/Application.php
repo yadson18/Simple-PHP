@@ -21,7 +21,7 @@
 			if (!empty($result)) {
 				if ($result->code !== 200) {
 					$result->view->setTitle('Danied Access');
-					$result->view->setTemplateError('daniedAccess');
+					$result->view->setTemplate('daniedAccess');
 				}
 
 				$result->view->render();

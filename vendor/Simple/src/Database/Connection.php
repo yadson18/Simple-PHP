@@ -6,32 +6,20 @@
 
 	class Connection
 	{
-		private $currentDriver;
-
 		private $connection;
 
-		public function __construct(string $driverName)
+		public function __construct(string $driverName, string $databaseName)
 		{
-			$this->setCurrentDriver(new Driver($driverName));
-		}
-		
-		public function connectDatabase(string $databaseName)
-		{
-			if (is_callable([$this->getCurrentDriver(), 'connect'])) {
-				$connection = $this->getCurrentDriver()->connect($databaseName);
-
-				if ($connection) {
-					$this->setConnection($connection);
-				}
-			}
+			$this->connect(new Driver($driverName), $databaseName);
 		}
 
-		public function on()
+		protected function connect(Driver $driver, string $databaseName)
 		{
-			if ($this->getConnection()) {
-				return true;
+			$driver = $driver->getDriver();
+
+			if (is_callable([$driver, 'connectInto'])) {
+				$this->setConnection($driver->connectInto($databaseName));
 			}
-			return false;
 		}
 
 		protected function setConnection(PDO $connection){
@@ -40,15 +28,5 @@
 
 		public function getConnection(){
 			return $this->connection;
-		}
-
-		protected function setCurrentDriver(Driver $driver)
-		{
-			$this->currentDriver = $driver->use();
-		}
-
-		protected function getCurrentDriver()
-		{
-			return $this->currentDriver;
 		}
 	}

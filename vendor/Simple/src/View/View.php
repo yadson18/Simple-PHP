@@ -121,8 +121,8 @@
 		{
 			ob_start();
 
-			if ($this->canBeRender($layout)) {
-				require_once $layout;
+			if ($this->canBeRender(View::LAYOUT . $layout)) {
+				require_once View::LAYOUT . $layout;
 			}
 
 			ob_end_flush();
@@ -133,21 +133,14 @@
 		{
 			switch ($this->getContentType()) {
 				case 'ajax':
-					echo $this->getLayoutContent(View::LAYOUT . View::AJAX);
+					echo $this->getLayoutContent(View::AJAX);
 				break;
 				case 'default':
-					echo $this->getLayoutContent(View::LAYOUT . View::DEFAULT);
+					echo $this->getLayoutContent(View::DEFAULT);
 				break;
 				default:
-					echo $this->getLayoutContent(View::LAYOUT . View::ERROR);
+					echo $this->getLayoutContent(View::ERROR);
 				break;
-			}
-		}
-
-		public function setTemplateError(string $template)
-		{
-			if ($this->getContentType() === 'error') {
-				$this->setTemplate($template);
 			}
 		}
 

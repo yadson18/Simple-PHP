@@ -1,51 +1,33 @@
 <?php 
 	namespace Simple\Database\Drivers;
 
-	use PDO;
+	use Simple\Database\Drivers\PDODriver;
 
-	class Firebird
+	class Firebird extends PDODriver
 	{
-		private $driverConfigs;
+		private static $dsn = 'firebird:dbname=%host%:%path%;charset=%encode%';
 
 		public function __construct(array $driverConfigs)
 		{
-			$this->setDriverConfigs($driverConfigs);
+			parent::__construct($driverConfigs);
 		}
 
-		protected function setDriverConfigs(array $driverConfigs)
-		{
-			$this->driverConfigs = $driverConfigs;
-		}
-
-		protected function getDatabaseConfig(string $databaseName)
-		{
-			$config = find_array_values($databaseName, $this->driverConfigs);
-			
-			if ($config) {
-				return $config;
-			}
-			return false;
-		}
-
-		public function connect(string $databaseName)
+		public function connectInto(string $databaseName)
 		{
 			$config = $this->getDatabaseConfig($databaseName);
 
 			if ($config) {
-				$host = $config['host'];
-				$path = $config['path'];
-				$charset = $config['encoding'];
+				$connectionConfig = [
+					'dsn' => replaceRecursive(static::$dsn, [
+						'%host%' => $config['host'],
+						'%path%' => $config['path'],
+						'%encode%' => $config['encoding']
+					]),
+					'user' => $config['user'],
+					'password' => $config['password']
+				];
 
-				$dsn = 'firebird:dbname=' . $host . ':' . $path . ';charset=' . $charset;
-				$user = $config['user'];
-				$password = $config['password'];
-
-				try {
-					return new PDO($dsn, $user, $password);
-				}
-				catch(PDOException $e){
-					return null;
-				}
+				return $this->connect($connectionConfig);
 			}
 		}
 	}	
