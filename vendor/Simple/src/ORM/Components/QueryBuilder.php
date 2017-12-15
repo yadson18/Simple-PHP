@@ -1,131 +1,304 @@
 <?php 
-	namespace Simple\ORM;
+	namespace Simple\ORM\Components;
 
 	use Simple\ORM\Component\Validator\Validator;
-	use Simple\ORM\Component\Query\Query;
-	use Simple\ORM\Component\Query\Insert;
-	use Simple\ORM\Component\Query\Select;
-	use Simple\ORM\Component\Query\Delete;
-	use Simple\ORM\Component\Query\Update;
+	use Simple\Database\Statement\Statement;
+	use Simple\Database\Connection;
 	
 	class QueryBuilder
 	{
-		private $Validator;
-		private $Select;
-		private $Insert;
-		private $Delete;
-		private $Update;
+		private $entity;
 
-		public function __construct(string $dbType, string $dbName, string $entityName)
+        private $connection;
+
+		private $type = 'select';
+
+		private $query = [];
+
+		private $values = [];
+
+		public function __construct(string $databaseType, string $databaseName, string $entity)
 		{
-			Query::initialize($dbType, $dbName, $entityName);
-			$this->Select = new Select();
-			$this->Insert = new Insert();
-			$this->Delete = new Delete();
-			$this->Update = new Update();
-			$this->Validator = new Validator();
+			$this->setConnection(new Connection($databaseType, $databaseName));
+			$this->setEntity($entity);
 		}
 
-		public function find(string $columnFilters)
+		protected function setConnection(Connection $connection)
 		{
-			if ($this->Select->setFilters($columnFilters) && Query::setType("select")) {
-				return $this;
+			$this->connection = $connection->getConnection();
+		}
+
+		protected function getConnection()
+		{
+			return $this->connection;
+		}
+
+		public function select(string $fields)
+		{
+			$this->setQueryType('select');
+			$this->concat('fields', ' ' . $fields);
+
+			return $this;
+		}
+
+		public function count(string $field)
+		{
+			$this->concat('count', '(' . $field . ')');
+
+			return $this;
+		}
+
+		public function first(int $quantity)
+		{
+			$this->concat('first', ' ' . $quantity);
+
+			return $this;
+		}
+
+		public function limit(int $quantity)
+		{
+			$this->first($quantity);
+
+			return $this;
+		}
+
+		public function skip(int $skipTo)
+		{
+			$this->concat('skip', ' ' . $skipTo);
+
+			return $this;
+		}
+
+		public function orderBy(array $order)
+		{
+			$orderString = '';
+
+			while ($order) {
+				$column = key($order);
+				$orderType = array_shift($order);
+
+				if (is_string($column)) {
+					$orderString .= ' ,' . $column . ' ' . $orderType;
+				}
+				else {
+					$orderString .= ' ,' . $orderType;
+				}
+			}
+
+			$this->concat('order by', ' ' . substr($orderString, 2));
+
+			return $this;
+		}
+
+		public function groupBy(string $fields)
+		{
+			$this->concat('group by', ' ' . $fields);
+
+			return $this;
+		}
+
+		public function values(array $dataToInsert)
+		{
+			$columns = implode(', ', array_keys($dataToInsert));
+			$columnsFormated = ':' . implode(', :', array_keys($dataToInsert));
+
+			while ($dataToInsert) {
+				$column = key($dataToInsert);
+				$value = array_shift($dataToInsert);
+
+				if (is_string($column)) {
+					$this->values[$column] = $value;
+				}
+			}
+
+			$this->concat('values', '(' . $columnsFormated . ')');
+
+			return $this;
+		}
+
+		public function insert(string $table)
+		{
+			$this->setQueryType('insert');
+			$this->concat('into', ' ' . $table);
+
+			return $this;
+		}
+
+		public function delete(string $table)
+		{
+			$this->setQueryType('delete');
+			$this->concat('from', ' ' . $table);
+
+			return $this;
+		}
+
+		public function from(string $tables)
+		{
+			$this->concat('from', ' ' . $tables);
+
+			return $this;
+		}
+
+		public function update(string $table)
+		{
+			$this->setQueryType('update');
+			$this->concat('table', ' ' . $table);
+
+			return $this;
+		}
+
+		public function set(array $valuesTuUpdate)
+		{
+			$columnsString = '';
+
+			while ($valuesTuUpdate) {
+				$column = key($valuesTuUpdate);
+				$value = array_shift($valuesTuUpdate);
+
+				if (is_string($column)) {
+					$columnsString .= ' ,' . $column . ' = :' . $column;
+					$this->values[$column] = $value; 
+				}
+			}
+
+			$this->concat('set', ' ' . substr($columnsString, 2));
+
+			return $this;
+		}
+
+		public function where(array $condition)
+		{
+			$conditionString = '';
+
+			while ($condition) {
+				$column = key($condition);
+				$value = array_shift($condition);
+
+				if (is_string($column)) {
+					if ($this->getQueryType() === 'select') {
+						$conditionString .= ' ' . $column . ' ?'; 
+						$this->values[] = $value;
+					}
+					else {
+						$columnRemoveSignal = strstr($column, ' ', true);
+						
+						$conditionString .= ' ' . $column . ' :' . $columnRemoveSignal;
+						$this->values[$columnRemoveSignal] = $value;
+					}
+				}
+				else {
+					$conditionString .= ' ' . $value;
+				}
+			}
+
+			$this->concat('where', $conditionString);
+
+			return $this;
+		}
+
+		public function fetch(string $fetchType = null)
+		{
+			$query = $this->mountQuery();
+
+			if ($query && $query->compiled()) {
+				$statement = $query->getStatement();
+
+				switch (strtolower($fetchType)) {
+					case 'all':
+						return $statement->fetchAll();
+						break;
+					case 'object':
+						return $statement->fetchObject();
+						break;
+					case 'class':
+						if (class_exists($this->getEntity())) {
+							return $statement->fetchObject($this->getEntity());
+						}
+						break;
+					case 'rowCount':
+						return $statement->rowCount();
+						break;
+					default:
+						return $statement->fetchAll();
+						break;
+				}
 			}
 			return false;
 		}
 
-		public function from(string $tableName)
+		protected function setEntity(string $entity)
 		{
-			if (
-				(Query::typeIs("select") && $this->Select->setTable($tableName)) ||
-				(Query::typeIs("delete") && $this->Delete->setTable($tableName)) ||
-				(Query::typeIs("update") && $this->Update->setTable($tableName))
-			) {
-				return $this;
-			}
-			return false;
+			$this->entity = $entity;
 		}
 
-		public function where(array $whereCondition)
+		protected function getEntity()
 		{
-			if (
-				(Query::typeIs("select") && $this->Select->setCondition($whereCondition)) ||
-				(Query::typeIs("delete") && $this->Delete->setCondition($whereCondition)) ||
-				(Query::typeIs("update") && $this->Update->setCondition($whereCondition))
-			) {
-				return $this;
-			}
-			return false;
-		}
-		
-		public function orderBy(array $columnsToOrder)
-		{
-			if ($this->Select->setOrderBy($columnsToOrder) && Query::typeIs("select")) {
-				return $this;
-			}
-			return false;
+			return $this->entity;
 		}
 
-		public function convertTo(string $returnTypeData)
+		protected function mountQuery()
 		{
-			if ($this->Select->setReturnType($returnTypeData) && Query::typeIs("select")) {
-				return $this;
+			switch ($this->getQueryType()) {
+				case 'select':
+					$order = [
+						'first', 'skip', 'count', 'fields', 'from', 'where', 'group by', 'order by'
+					];
+					break;
+				case 'insert':
+					$order = ['into', 'values'];
+					break;
+				case 'delete':
+					$order = ['from', 'where'];
+					break;
+				case 'update':
+					$order = ['table', 'set', 'where'];
+					break;
 			}
-			return false;
+
+			$statement = new Statement($this->getConnection());
+			$statement->compileQuery(
+				$this->getQueryType(), $this->mountQueryByOrder($order), $this->values
+			);
+			$this->resetToDefault();
+
+			return $statement;
 		}
 
-		public function limit(int $limitNumber)
+		protected function mountQueryByOrder(array $order)
 		{
-			if ($this->Select->setLimit($limitNumber) && Query::typeIs("select")) {
-				return $this;
+			$query = $this->getQueryType();
+
+			foreach ($order as $identifier) {
+				if (isset($this->query[$this->getQueryType()][$identifier])) {
+					if ($identifier !== 'fields' && $identifier !== 'table') {
+						$query .= ' ' . $identifier;
+					}
+
+					$query .= $this->query[$this->getQueryType()][$identifier];
+				}
 			}
-			return false;
+
+			return $query;
 		}
 
-		public function insert(array $dataToInsert)
+		protected function resetToDefault()
 		{
-			if ($this->Insert->setInsertQuery($dataToInsert) && Query::setType("insert")) {
-				return $this;
-			}
-			return false;
+			unset($this->query[$this->getQueryType()]);
+			$this->values = [];
 		}
 
-		public function into(string $tableName)
+		protected function concat(string $identifier, string $query)
 		{
-			if ($this->Insert->setTable($tableName) && Query::setType("insert")) {
-				return $this;
-			}
-			return false;
+			$this->query[$this->getQueryType()][$identifier] = $query;
 		}
 
-		public function delete(){
-			if (Query::setType("delete")) {
-				return $this;
-			}
-			return false;
+		protected function setQueryType(string $type)
+		{
+			$this->type = $type;
 		}
 
-		public function update(array $dataToUpdate)
+		protected function getQueryType()
 		{
-			if ($this->Update->setUpdateQuery($dataToUpdate) && Query::setType("update")) {
-				return $this;
-			}
-			return false;
-		}
-
-		public function getResult()
-		{
-			if (Query::typeIs("select")) {
-				return $this->Select->getResult();
-			}
-			else if (Query::typeIs("insert")) {
-				return $this->Insert->getResult();
-			}
-			else if (Query::typeIs("delete")) {
-				return $this->Delete->getResult();
-			}
-			else if (Query::typeIs("update")) {
-				return $this->Update->getResult();
-			}
+			return $this->type;
 		}
 	}

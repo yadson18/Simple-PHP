@@ -9,10 +9,10 @@
 		{
 			$this->setDatabase('Firebird', 'SRICASH');
 
-			$this->setTable('Page');
+			$this->setTable('IBGE');
 
-			$this->setPrimaryKey('id');
+			$this->setPrimaryKey('sigla');
 
-			$this->setBelongsTo('cod_id', []);
+			$this->setBelongsTo('', []);
 		}
 	}

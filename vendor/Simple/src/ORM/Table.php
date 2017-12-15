@@ -1,6 +1,8 @@
 <?php
 	namespace Simple\ORM;
 	
+	use Simple\ORM\Interfaces\EntityInterface;
+	use Simple\ORM\Components\QueryBuilder;
 	use Simple\Util\Builder;
 
 	abstract class Table
@@ -10,6 +12,8 @@
 		private $databaseType;
 
 		private $databaseName;
+
+		private $queryBuilder;
 		
 		private $belongsTo = [];
 
@@ -19,16 +23,25 @@
 
 		public function newEntity()
 		{
-			$entityName = replace(splitNamespace(get_class($this)), 'Table', '');
-			$entity = new Builder(Table::ENTITY_NAMESPACE . $entityName);
+			$entity = new Builder($this->getEntityName());
 
 			return $entity->getBuiltInstance();
 		}
 
+		protected function getEntityName()
+		{
+			$entityName = replace(splitNamespace(get_class($this)), 'Table', '');
+
+			return Table::ENTITY_NAMESPACE . $entityName;
+		}
+
 		protected function setDatabase(string $databaseType, string $databaseName)
 		{
-			$this->setDatabaseType($databaseType);
-			$this->setDatabaseName($databaseName);
+			$entity = $this->newEntity();
+
+			$this->queryBuilder = new QueryBuilder(
+				$databaseType, $databaseName, $this->getEntityName()
+			);
 		}
 
 		protected function setBelongsTo(string $fieldName, array $options)
@@ -64,19 +77,36 @@
 			return $this->primaryKey;
 		}
 
-		protected function setDatabaseType(string $databaseType){
-			$this->databaseType = $databaseType;
+		public function find(string $fields)
+		{
+			if (isset($this->queryBuilder) && !empty($fields)) {
+				return $this->queryBuilder->select($fields)
+					->from($this->getTable());
+			}
 		}
 
-		protected function getDatabaseType(){
-			return $this->databaseType;
+		public function get(string $key)
+		{
+			if (isset($this->queryBuilder) && !empty($key)) {
+				if ($key === 'all') {
+					return $this->queryBuilder->select('*')
+						->from($this->getTable())
+						->fetch('all');
+				}
+				return $this->queryBuilder->select('*')
+					->from($this->getTable())
+					->where([$this->getPrimaryKey() . ' =' => $key])
+					->limit(1)
+					->fetch('class');
+			}
 		}
 
-		protected function setDatabaseName(string $databaseName){
-			$this->databaseName = $databaseName;
-		}
-
-		protected function getDatabaseName(){
-			return $this->databaseName;
+		public function set(EntityInterface $entity)
+		{	
+			if (isset($this->queryBuilder) && isset($entity)) {
+				return $this->queryBuilder->insert($this->getTable())
+					->values((array) $entity)
+					->fetch('rowCount');
+			}
 		}
 	}

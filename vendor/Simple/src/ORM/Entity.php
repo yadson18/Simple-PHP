@@ -1,7 +1,9 @@
 <?php 
 	namespace Simple\ORM;
 
-	abstract class Entity
+	use Simple\ORM\Interfaces\EntityInterface;
+
+	abstract class Entity implements EntityInterface
 	{
 
 	}
