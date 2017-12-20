@@ -1,42 +1,44 @@
-.pages-default-css{
-	*{
-		.margin(0);
-		.padding(0);
-	}
-	label{
-		.font-color(#4f4f4f);
-	}
-	fieldset{ 
-		legend{
-			.font-color(#5f5f5f);
-			.font-size(1.5em);
-			.margin(15px 0 0 0);
-		}
-	}
-	div.alert{
-		.font-size(1em);
-		.text-align(center);
-	}
-	button.close{
-		.font-size(1.2em);
-	}
-    #debug-screen{
-        .bg-color(#ffef00);
-        .border(solid 1px #ccc);
-        .margin(15px 0);
-        .font-size(1em);
-    }
+.margin-bottom(@margin){
+    -webkit-margin-bottom: @margin;
+    -moz-margin-bottom: @margin;
+    -o-margin-bottom: @margin;
+    margin-bottom: @margin;
 }
-
-.rotate-icons-effect(@transition, @transform){
+.transition(@transition){
+    -webkit-transition: @transition;
+    -moz-transition: @transition;
+    -o-transition: @transition;
     transition: @transition;
-    transform: @transform;
+}
+.text-transform(@transform){
+    -webkit-text-transform: @transform;
+    -moz-text-transform: @transform;
+    -o-text-transform: @transform;
+    text-transform: @transform;
+}
+.line-height(@height){
+    -webkit-font-height: @height;
+    -moz-font-height: @height;
+    -o-font-height: @height;
+    font-height: @height;
+}
+.font-family(@family){
+    -webkit-font-family: @family;
+    -moz-font-family: @family;
+    -o-font-family: @family;
+    font-family: @family;
 }
 .font-size(@size){
     -webkit-font-size: @size;
     -moz-font-size: @size;
     -o-font-size: @size;
     font-size: @size;
+}
+.border-bottom(@border){
+    -webkit-border-bottom: @border;
+    -moz-border-bottom: @border;
+    -o-border-bottom: @border;
+    border-bottom: @border;
 }
 .border-radius(@radius){
     -webkit-border-radius: @radius;
@@ -104,6 +106,12 @@
     -o-box-shadow: @attributes;
     box-shadow: @attributes;
 }
+.background-image(@image){
+    -webkit-background-image: @image;
+    -moz-background-image: @image;
+    -o-background-image: @image;
+    background-image: @image;
+}
 .height(@height){
 	-webkit-height: @height;
     -moz-height: @height;
@@ -164,6 +172,12 @@
     -o-font-size: @size;
     font-size: @size;
 }
+.font-style(@style){
+    -webkit-font-style: @style;
+    -moz-font-style: @style;
+    -o-font-style: @style;
+    font-style: @style;
+}
 .cursor(@cursor){
 	-webkit-cursor: @cursor;
     -moz-cursor: @cursor;
@@ -176,5 +190,3 @@
     -o-opacity: @opacity;
     opacity: @opacity;
 }
-
-.pages-default-css;
