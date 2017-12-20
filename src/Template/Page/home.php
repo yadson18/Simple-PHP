@@ -1,7 +1,7 @@
 <div class="jumbotron text-center">
     <h1>Company</h1> 
     <p>We specialize in blablabla</p> 
-    <form>
+    <form class="form-inline">
         <div class="input-group">
             <input type="email" class="form-control" size="50" placeholder="Email Address" required>
             <div class="input-group-btn">
@@ -23,7 +23,7 @@
             <button class="btn btn-default btn-lg">Get in Touch</button>
         </div>
         <div class="col-sm-4">
-            <span class="glyphicon glyphicon-signal logo"></span>
+            <i class="fas fa-signal logo"></i>
         </div>
     </div>
 </div>
@@ -31,7 +31,7 @@
 <div class="container-fluid bg-grey">
     <div class="row">
         <div class="col-sm-4">
-            <span class="glyphicon glyphicon-globe logo slideanim"></span>
+            <i class="fas fa-globe logo slideanim slide"></i>
         </div>
         <div class="col-sm-8">
             <h2>Our Values</h2><br>
@@ -151,12 +151,10 @@
 
         <!-- Left and right controls -->
         <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
+            <i class="fas fa-caret-left fa-2x"></i>
         </a>
         <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
+            <i class="fas fa-caret-right fa-2x"></i>
         </a>
     </div>
 </div>

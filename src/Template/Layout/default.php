@@ -6,7 +6,10 @@
 		<?= $this->Html->encoding() ?>
 
 		<?= $this->Html->css('bootstrap.min.css') ?>
-		<?= $this->Html->css('font-awesome.min.css') ?>
+		<?= $this->Html->css('fontawesome-all.min.css') ?>
+
+		<?= $this->Html->css('https://fonts.googleapis.com/css?family=Montserrat') ?>
+		<?= $this->Html->css('https://fonts.googleapis.com/css?family=Lato') ?>
 		
 		<?= $this->Html->script('jquery.min.js') ?>
 		<?= $this->Html->script('bootstrap.min.js') ?>
