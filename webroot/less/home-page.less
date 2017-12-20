@@ -35,13 +35,10 @@ body {
 	.bg-grey {
 		.bg-color(#f6f6f6);
 	}
-	.logo-small, .logo {
+	.logo-small, .logo,
+	.carousel-control .right,
+	.carousel-control .left {
 		.font-color(#f4511e);
-	}
-	.carousel-control {
-		.right, .left {
-			.font-color(#f4511e);
-		}
 	}
 	.logo-small {
 		.font-size(50px);
@@ -121,6 +118,97 @@ body {
 			.bg-color(#f4511e);
 			.font-color(#fff);
 			.margin(15px 0);
+		}
+	}
+	.navbar {
+		.margin-bottom(0);
+		.bg-color(#f4511e);
+		.z-index(9999);
+		.border(0);
+		.font-size(12px);
+		.line-height(1.42857143);
+		.letter-spacing(4px);
+		.border-radius(0);
+		.font-family(Montserrat);
+		.font-family(sans-serif);
+
+		.navbar-brand {
+			.font-color(#fff);
+		}
+		.navbar-nav {
+			li a {
+				.font-color(#fff);
+			}
+			li a:hover, li.active a {
+				.bg-color(#fff);
+				.font-color(#f4511e);
+			} 
+		}
+		.navbar-toggle {
+			.border-color(transparent);
+			.font-color(#fff);
+
+			&:hover {
+				.bg-color(#f4511e);
+			}
+			&:focus {
+				.bg-color(#f4511e);
+			}
+			.icon-bar {
+				.bg-color(#fff);
+			}
+		}
+	}
+	footer .glyphicon {
+		.font-size(20px);
+		.margin-bottom(20px);
+		.font-color(#f4511e);
+	}
+	.slideanim {
+		.visibility(hidden);
+
+		.gray-color {
+			.font-color(#303030);
+		}
+	}
+	.slide {
+		.animation-name(slide);
+		.animation-duration(1s);
+		.visibility(visible);
+	}
+	@media screen and (max-width: 768px) {
+		.col-sm-4 {
+			.text-align(center);
+			.margin(25px 0);
+		}
+		.btn-lg {
+			.width(100%);
+			.margin-bottom(35px);
+		}
+	}
+	@media screen and (max-width: 480px) {
+		.logo {
+			.font-size(150px);
+		}
+	}
+	@keyframes slide {
+		0% {
+			.opacity(0);
+			.transform(translateY(70%));
+		} 
+		100% {
+			.opacity(1);
+			.transform(translateY(0%));
+		}
+	}
+	@-webkit-keyframes slide {
+		0% {
+			.opacity(0);
+			.transform(translateY(70%));
+		} 
+		100% {
+			.opacity(1);
+			.transform(translateY(0%));
 		}
 	}
 }

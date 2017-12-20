@@ -17,9 +17,9 @@
 
 		private $values = [];
 
-		public function __construct(string $databaseType, string $databaseName, string $entity)
+		public function __construct(string $driverName, string $databaseName, string $entity)
 		{
-			$this->setConnection(new Connection($databaseType, $databaseName));
+			$this->setConnection(new Connection($driverName, $databaseName));
 			$this->setEntity($entity);
 		}
 
@@ -196,6 +196,13 @@
 			return $this;
 		}
 
+		public function whereNotExists(string $query)
+		{
+			$this->concat('where not exists', ' (' . $query . ')');
+
+			return $this;
+		}
+
 		public function fetch(string $fetchType = null)
 		{
 			$query = $this->mountQuery();
@@ -203,7 +210,7 @@
 			if ($query && $query->compiled()) {
 				$statement = $query->getStatement();
 
-				switch (strtolower($fetchType)) {
+				switch ($fetchType) {
 					case 'all':
 						return $statement->fetchAll();
 						break;
@@ -245,7 +252,7 @@
 					];
 					break;
 				case 'insert':
-					$order = ['into', 'values'];
+					$order = ['into', 'values', 'where not exists'];
 					break;
 				case 'delete':
 					$order = ['from', 'where'];

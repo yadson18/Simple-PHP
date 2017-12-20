@@ -35,12 +35,12 @@
 			return Table::ENTITY_NAMESPACE . $entityName;
 		}
 
-		protected function setDatabase(string $databaseType, string $databaseName)
+		protected function setDatabase(string $driverName, string $databaseName)
 		{
 			$entity = $this->newEntity();
 
 			$this->queryBuilder = new QueryBuilder(
-				$databaseType, $databaseName, $this->getEntityName()
+				$driverName, $databaseName, $this->getEntityName()
 			);
 		}
 
@@ -79,34 +79,66 @@
 
 		public function find(string $fields)
 		{
-			if (isset($this->queryBuilder) && !empty($fields)) {
-				return $this->queryBuilder->select($fields)
-					->from($this->getTable());
+			if (isset($this->queryBuilder)) {
+				if (!empty($fields) && !empty($this->getTable())) {
+					return $this->queryBuilder->select($fields)
+						->from($this->getTable());
+				}
 			}
 		}
 
 		public function get(string $key)
 		{
-			if (isset($this->queryBuilder) && !empty($key)) {
-				if ($key === 'all') {
-					return $this->queryBuilder->select('*')
-						->from($this->getTable())
-						->fetch('all');
+			if (isset($this->queryBuilder)) {
+				if (!empty($key) && !empty($this->getTable())) {
+					if ($key === 'all') {
+						return $this->queryBuilder->select('*')
+							->from($this->getTable())
+							->fetch('all');
+					}
+					else if (!empty($this->getPrimaryKey())) {
+						return $this->queryBuilder->select('*')
+							->from($this->getTable())
+							->where([$this->getPrimaryKey() . ' = ' => $key])
+							->limit(1)
+							->fetch('class');
+					}
 				}
-				return $this->queryBuilder->select('*')
-					->from($this->getTable())
-					->where([$this->getPrimaryKey() . ' =' => $key])
-					->limit(1)
-					->fetch('class');
 			}
 		}
 
-		public function set(EntityInterface $entity)
+		public function save(EntityInterface $entity)
 		{	
-			if (isset($this->queryBuilder) && isset($entity)) {
-				return $this->queryBuilder->insert($this->getTable())
-					->values((array) $entity)
-					->fetch('rowCount');
+			if (isset($this->queryBuilder) && !empty($this->getTable())) {
+				$primaryKey = $this->getPrimaryKey();
+
+				if (isset($entity->$primaryKey)) {
+					if (!$this->get($entity->$primaryKey)) {
+						return $this->queryBuilder->insert($this->getTable())
+							->values((array) $entity)
+							->fetch('rowCount');
+					}
+					$primaryKeyValue = $entity->$primaryKey;
+					unset($entity->$primaryKey);
+
+					return $this->queryBuilder->update($this->getTable())
+						->set((array) $entity)
+						->where([$primaryKey . ' = ' => $primaryKeyValue])
+						->fetch('rowCount');
+				}
+			}
+		}
+
+		public function delete(EntityInterface $entity) 
+		{
+			if (isset($this->queryBuilder)) {
+				$primaryKey = $this->getPrimaryKey();
+
+				if (isset($entity->$primaryKey)) {
+					return $this->queryBuilder->delete($this->getTable())
+						->where([$primaryKey . ' = ' => $entity->$primaryKey])
+						->fetch('rowCount');
+				}
 			}
 		}
 	}

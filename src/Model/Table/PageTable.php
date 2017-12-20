@@ -9,9 +9,9 @@
 		{
 			$this->setDatabase('Firebird', 'SRICASH');
 
-			$this->setTable('IBGE');
+			$this->setTable('CADASTRO');
 
-			$this->setPrimaryKey('sigla');
+			$this->setPrimaryKey('cod_cadastro');
 
 			$this->setBelongsTo('', []);
 		}
