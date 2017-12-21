@@ -13,7 +13,7 @@
 
 		const SUFIX = 'Controller';
 
-		public $Request;
+		public $request;
 
 		private $view;
 
@@ -23,7 +23,7 @@
 		{
 			$this->component = new Component();
 			
-			$this->Request = $request;
+			$this->request = $request;
 			
 			$this->view = $view;
 

@@ -9,10 +9,6 @@
 	{
 		const ENTITY_NAMESPACE = 'App\\Model\\Entity\\';
 
-		private $databaseType;
-
-		private $databaseName;
-
 		private $queryBuilder;
 		
 		private $belongsTo = [];
@@ -26,6 +22,17 @@
 			$entity = new Builder($this->getEntityName());
 
 			return $entity->getBuiltInstance();
+		}
+
+		public function patchEntity(EntityInterface $entity, array $data)
+		{
+			foreach ($data as $attribute => $value) {
+				if (is_string($attribute)) {
+					$entity->$attribute = $value;
+				}
+			}
+
+			return $entity;
 		}
 
 		protected function getEntityName()
@@ -85,6 +92,7 @@
 						->from($this->getTable());
 				}
 			}
+			return false;
 		}
 
 		public function get(string $key)
@@ -105,6 +113,7 @@
 					}
 				}
 			}
+			return false;
 		}
 
 		public function save(EntityInterface $entity)
@@ -127,6 +136,7 @@
 						->fetch('rowCount');
 				}
 			}
+			return false;
 		}
 
 		public function delete(EntityInterface $entity) 
@@ -140,5 +150,6 @@
 						->fetch('rowCount');
 				}
 			}
+			return false;
 		}
 	}
