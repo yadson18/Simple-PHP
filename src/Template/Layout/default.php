@@ -2,14 +2,15 @@
 <html lang='pt-br'>
 	<head>
 		<title><?= $this->fetch('appName') . $this->fetch('title') ?></title>
+
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<?= $this->Html->encoding() ?>
 
 		<?= $this->Html->css('bootstrap.min.css') ?>
 		<?= $this->Html->css('fontawesome-all.min.css') ?>
 
-		<?= $this->Html->css('https://fonts.googleapis.com/css?family=Montserrat') ?>
-		<?= $this->Html->css('https://fonts.googleapis.com/css?family=Lato') ?>
+		<?= $this->Html->font('Montserrat') ?>
+		<?= $this->Html->font('Lato') ?>
 		
 		<?= $this->Html->script('jquery.min.js') ?>
 		<?= $this->Html->script('bootstrap.min.js') ?>
@@ -21,7 +22,7 @@
 
 		<?= $this->Html->script('less.min.js') ?>
 	</head>
-	<body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">	
+	<body id="top" data-spy="scroll" data-target=".navbar" data-offset="60">	
 		<nav class="navbar navbar-default navbar-fixed-top">
   			<div class="container">
     			<div class="navbar-header">
@@ -30,7 +31,7 @@
 				        <span class="icon-bar"></span>
 				        <span class="icon-bar"></span>                        
       				</button>
-      				<a class="navbar-brand" href="#myPage">Logo</a>
+      				<a class="navbar-brand" href="#top">Logo</a>
     			</div>
     			<div class="collapse navbar-collapse" id="myNavbar">
 			      	<ul class="nav navbar-nav navbar-right">
@@ -47,7 +48,7 @@
 			<?= $this->fetch('content') ?>
 		</div>
 		<footer class="container-fluid text-center">
-  			<a href="#myPage" title="To Top">
+  			<a href="#top" title="To Top">
   				<div id="top">
 	  				<i class="fas fa-angle-up fa-2x"></i>
 	  				<p>Voltar ao Topo</p>

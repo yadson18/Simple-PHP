@@ -28,3 +28,5 @@
 	define('JS', WWW_ROOT . 'js' . DS);
 
 	define('LESS', WWW_ROOT . 'less' . DS);
+
+	define('FONT', WWW_ROOT . 'webfonts' . DS);

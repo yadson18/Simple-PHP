@@ -26,6 +26,20 @@
             }
     	}
 
+        public function font(string $fontName)
+        {
+            if (is_file(FONT . $fontName)) {
+                return $this->replaceProperties('link', [
+                    '%href%' => '/css/' . $fontName,
+                    '/%type%' => ''
+                ]);
+            }
+            return $this->replaceProperties('link', [
+                '%href%' => 'https://fonts.googleapis.com/css?family=' . $fontName,
+                '/%type%' => ''
+            ]);
+        }
+
         public function script(string $scriptName)
         {
             if (is_file(JS . $scriptName)) {
