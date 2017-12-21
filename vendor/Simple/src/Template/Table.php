@@ -8,13 +8,13 @@
 	{
 		public function initialize()
 		{
-			$this->setDatabase("%db_type%", "%db_name%");
+			$this->setDatabase('%db_type%', '%db_name%');
 
-			$this->setTable("%table%");
+			$this->setTable('%table%');
 
-			$this->setPrimaryKey("%primary_key%");
+			$this->setPrimaryKey('%primary_key%');
 
-			$this->setBelongsTo("", []);
+			$this->setBelongsTo('', []);
 		}
 
 		public function defaultValidator(Validator $validator)
