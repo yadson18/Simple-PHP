@@ -151,10 +151,11 @@
 
         <!-- Left and right controls -->
         <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-            <i class="fas fa-caret-left fa-2x"></i>
+            <i class="fas fa-angle-left fa-2x"></i>
+
         </a>
         <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-            <i class="fas fa-caret-right fa-2x"></i>
+            <i class="fas fa-angle-right fa-2x"></i>
         </a>
     </div>
 </div>
@@ -232,9 +233,9 @@
     <div class="row">
         <div class="col-sm-5">
             <p>Contact us and we'll get back to you within 24 hours.</p>
-            <p><span class="glyphicon glyphicon-map-marker"></span> Chicago, US</p>
-            <p><span class="glyphicon glyphicon-phone"></span> +00 1515151515</p>
-            <p><span class="glyphicon glyphicon-envelope"></span> myemail@something.com</p>
+            <p><i class="fas fa-map-marker-alt"></i> Chicago, US</p>
+            <p><i class="fas fa-phone"></i> +00 1515151515</p>
+            <p><i class="fas fa-envelope"></i> myemail@something.com</p>
         </div>
         <div class="col-sm-7 slideanim">
             <div class="row">
@@ -261,7 +262,7 @@
 <script>
     function myMap() {
         var myCenter = new google.maps.LatLng(-8.055093, -34.909755);
-        var mapProp = {center:myCenter, zoom:19, scrollwheel:false, draggable:false, mapTypeId:google.maps.MapTypeId.ROADMAP};
+        var mapProp = {center:myCenter, zoom:18, scrollwheel:false, draggable:false, mapTypeId:google.maps.MapTypeId.ROADMAP};
         var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
         var marker = new google.maps.Marker({position:myCenter});
         marker.setMap(map);

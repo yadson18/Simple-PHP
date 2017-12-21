@@ -34,8 +34,11 @@ body {
 		.bg-color(#f6f6f6);
 	}
 	.logo-small, .logo,
-	.carousel-control i{
+	.carousel-control i {
 		.font-color(#f4511e);
+	}
+	.carousel-control i {
+		.margin(20% 0 0 0);
 	}
 	.logo-small {
 		.font-size(50px);
@@ -58,11 +61,10 @@ body {
 		.background-image(none);
 	}
 	.carousel-indicators li {
+		.border-color(#f4511e);
+	}
+	.carousel-indicators li.active {
 		.bg-color(#f4511e);
-
-		.active {
-			.bg-color(#f4511e);
-		}
 	}
 	.item {
 		h4 {
@@ -84,37 +86,34 @@ body {
 		&:hover {
 			.box-shadow(5px 0px 40px rgba(0,0,0, .2));
 		}
-	}
-	.panel-footer {
-		.btn {
-			&:hover {
-				.border(1px solid #f4511e);
-				.bg-color(#fff);
-				.font-color(#f4511e);
-			}
-		}
-	}
-	.panel-heading {
-		.font-color(#fff);
-		.bg-color(#f4511e);
-		.padding(25px);
-		.border-radius(0px);
-		.border-bottom(1px solid transparent);
-	}
-	.panel-footer {
-		.bg-color(white);
-
-		h3 {
-			.font-size(32px);
-		}
-		h4 {
-			.font-color(#aaa);
-			.font-size(14px);
-		}
-		.btn {
-			.bg-color(#f4511e);
+		.panel-heading {
 			.font-color(#fff);
-			.margin(15px 0);
+			.bg-color(#f4511e);
+			.padding(25px);
+			.border-radius(0px);
+			.border-bottom(1px solid transparent);
+		}
+		.panel-footer {
+			.bg-color(white);
+
+			.btn {
+				.bg-color(#f4511e);
+				.font-color(#fff);
+				.margin(15px 0);
+
+				&:hover {
+					.border(1px solid #f4511e);
+					.bg-color(#fff);
+					.font-color(#f4511e);
+				}
+			}
+			h3 {
+				.font-size(32px);
+			}
+			h4 {
+				.font-color(#aaa);
+				.font-size(14px);
+			}
 		}
 	}
 	.navbar {
@@ -155,10 +154,14 @@ body {
 			}
 		}
 	}
-	footer .glyphicon {
-		.font-size(20px);
-		.margin-bottom(20px);
+	footer #top {
 		.font-color(#f4511e);
+		.margin-bottom(20px);
+		.display(inline-block);
+
+		p {
+			.margin(-10 0);
+		}
 	}
 	.slideanim {
 		.visibility(hidden);

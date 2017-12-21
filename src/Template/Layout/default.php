@@ -48,7 +48,10 @@
 		</div>
 		<footer class="container-fluid text-center">
   			<a href="#myPage" title="To Top">
-    			<span class="glyphicon glyphicon-chevron-up"></span>
+  				<div id="top">
+	  				<i class="fas fa-angle-up fa-2x"></i>
+	  				<p>Voltar ao Topo</p>
+  				</div>
   			</a>
   			<p>
   				Bootstrap Theme Made By 
