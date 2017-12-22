@@ -5,17 +5,20 @@
 	use Simple\ORM\Components\QueryBuilder;
 	use Simple\Util\Builder;
 
-	abstract class Table
+	abstract class Table extends QueryBuilder
 	{
 		const ENTITY_NAMESPACE = 'App\\Model\\Entity\\';
 
-		private $queryBuilder;
-		
 		private $belongsTo = [];
 
 		private $table;
 		
 		private $primaryKey;
+
+		public function __construct(string $driverName, string $databaseName)
+		{
+			parent::__construct($driverName, $databaseName, $this->getEntityName());
+		}
 
 		public function newEntity()
 		{
@@ -40,15 +43,6 @@
 			$entityName = replace(splitNamespace(get_class($this)), 'Table', '');
 
 			return Table::ENTITY_NAMESPACE . $entityName;
-		}
-
-		protected function setDatabase(string $driverName, string $databaseName)
-		{
-			$entity = $this->newEntity();
-
-			$this->queryBuilder = new QueryBuilder(
-				$driverName, $databaseName, $this->getEntityName()
-			);
 		}
 
 		protected function setBelongsTo(string $fieldName, array $options)
@@ -84,7 +78,7 @@
 			return $this->primaryKey;
 		}
 
-		public function find(string $fields)
+		/*public function find(string $fields)
 		{
 			if (isset($this->queryBuilder)) {
 				if (!empty($fields) && !empty($this->getTable())) {
@@ -151,5 +145,5 @@
 				}
 			}
 			return false;
-		}
+		}*/
 	}

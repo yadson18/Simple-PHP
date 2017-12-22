@@ -10,7 +10,27 @@
 					: array_deep_search($keys, $array[$key]);
 			}
 		}
+	}
 
+	function mergeSubArrays(array $array, int $start, int $end)
+	{
+		$result = [];
+		$array = array_values($array);
+		
+		if ($start < $end) {
+			if (sizeof($array) > $start && sizeof($array) >= $end) {
+				for ($i = $start; $i < $end; $i++) { 
+					$result = array_merge($result, $array[$i]);
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	function removeExtraSpaces(string $value)
+	{
+		return preg_replace('/( )+/', ' ', $value);
 	}
 
 	function splitNamespace(string $namespace)
@@ -51,23 +71,26 @@
 		echo "</pre>";
 	}
 
-	function removeSpecialChars($string) 
+	function removeSpecialChars(string $value) 
 	{
-	    $string = str_replace(["á","à","â","ã","ä"], "a", $string);
-	    $string = str_replace(["Á","À","Â","Ã","Ä"], "A", $string);
-	    $string = str_replace(["é","è","ê"], "e", $string);
-	    $string = str_replace(["É","È","Ê"], "E", $string);
-	    $string = str_replace(["í","ì"], "i", $string);
-	    $string = str_replace(["Í","Ì"], "I", $string);
-	    $string = str_replace(["ó","ò","ô","õ","ö"], "o", $string);
-	    $string = str_replace(["Ó","Ò","Ô","Õ","Ö"], "O", $string);
-	    $string = str_replace(["ú","ù","ü"], "u", $string);
-	    $string = str_replace(["Ú","Ù","Ü"], "U", $string);
-	    $string = str_replace("ç", "c", $string);
-	    $string = str_replace("Ç", "C", $string);
-	    $string = str_replace([
-	    	"[","]",">","<","}","{",")","(",":",";",",","!","?","*","%","~","^","`","@"
-	    ], "", $string);
-	    
-	    return $string;
+		$invalid = [
+			'a' => ["á","à","â","ã","ä"],
+			'e' => ["é","è","ê"],
+			'i' => ["í","ì"],
+			'o' => ["ó","ò","ô","õ","ö"],
+			'u' => ["ú","ù","ü"],
+			'ç' => ['c'],
+			'' => [
+	    		"[","]",">","<","}","{",")","(",":",";",",","!","?","*","%","~","^","`","@"
+	    	]
+		];
+
+		foreach ($invalid as $replaceTo => $invalidValues) {
+			$value = str_replace($invalidValues, $replaceTo, $value);
+			$value = str_replace(
+				array_map('mb_strtoupper', $invalidValues), strtoupper($replaceTo), $value
+			);
+		}
+		
+		return $value;
 	}

@@ -13,7 +13,37 @@
 
 		private $type = 'select';
 
-		private $query = [];
+		private $lastQueryPartIndex = [];
+
+		private $parts = [
+	        'select' => [
+	        	'first' => [],
+	        	'skip' => [],
+	        	'distinct' => [],
+	        	'sum' => [],
+	        	'count' => [],
+	        	'fields' => [],
+	        	'from' => [],
+	        	'join' => [],
+	        	'where' => [],
+	        	'group' => [],
+	        	'order' => []
+	        ],
+	        'insert' => [
+	        	'into' => [],
+	        	'fields' => [],
+	        	'values' => []
+	        ],
+	        'delete' => [
+	        	'from' => [],
+	        	'where' => []
+	        ],
+	        'update' => [
+	        	'table' => [],
+	        	'set' => [],
+	        	'where' => []
+	        ]
+	    ];
 
 		private $values = [];
 
@@ -21,6 +51,234 @@
 		{
 			$this->setConnection(new Connection($driverName, $databaseName));
 			$this->setEntity($entity);
+		}
+
+		public function select(array $fieldsToGet = [])
+		{
+			$this->setQueryType('select');
+			if (!empty($fieldsToGet)) {
+				$this->insertQuery('fields', 0, implode(', ', $fieldsToGet));
+			}
+
+			return $this;
+		}
+
+		public function as(string $alias)
+		{
+			$column = key($this->lastQueryPartIndex);
+			$index = array_shift($this->lastQueryPartIndex);
+
+			if (isset($this->parts['select'][$column][$index])) {
+				$newAlias = $this->parts['select'][$column][$index] . ' as ' . $alias;
+				$this->insertQuery($column, $index, $newAlias);
+			}
+
+			return $this;
+		}
+
+		public function first(int $quantity)
+		{
+			$this->insertQuery('first', 0, 'first ' . $quantity);
+
+			return $this;
+		}
+
+		public function skip(int $skipTo)
+		{
+			$this->insertQuery('skip', 0, 'skip ' . $skipTo);
+
+			return $this;
+		}
+
+		public function distinct(string $fieldToDistinct)
+		{
+			$this->insertQuery('distinct', 0, 'distinct(' . $fieldToDistinct . ')');
+			$this->lastQueryPartIndex['distinct'] = 0;
+				
+			return $this;
+		}
+
+		public function sum(string $fieldToSum)
+		{
+			$this->insertQuery('sum', '', 'sum(' . $fieldToSum . ')');	
+			$this->lastQueryPartIndex['sum'] = sizeof($this->parts['select']['sum']) - 1;
+
+			return $this;
+		}
+
+		public function count(string $fieldToCount)
+		{
+			$this->insertQuery('count', '', 'count(' . $fieldToCount . ')');	
+			$this->lastQueryPartIndex['count'] = sizeof($this->parts['select']['count']) - 1;
+
+			return $this;
+		}
+
+		public function from(array $tables)
+		{
+			$this->insertQuery('from', 0, 'from ' . implode(', ', $tables));
+
+			return $this;
+		}
+
+		public function join(array $join)
+		{
+			$this->parts['select']['join'] = array_merge(
+				$this->parts['select']['join'], $join
+			);
+
+			return $this;
+		}
+
+		public function where(array $queryCondition)
+		{
+			$condition = 'where';
+
+			while ($queryCondition) {
+				$column = key($queryCondition);
+				$value = array_shift($queryCondition);
+
+				if (is_string($column)) {
+					if ($this->getQueryType() === 'select') {
+						$condition .= ' ' . $column . ' ?'; 
+						$this->values[] = $value;
+					}
+					else {
+						$columnRemoveSignal = strstr($column, ' ', true);
+						
+						$condition .= ' ' . $column . ' :' . $columnRemoveSignal;
+						$this->values[$columnRemoveSignal] = $value;
+					}
+				}
+				else {
+					$condition .= ' ' . $value;
+				}
+			}
+
+			$this->insertQuery('where', 0, $condition);
+
+			return $this;
+		}
+
+		public function groupBy(array $fieldsToGroup)
+		{
+			$this->insertQuery('group', 0, 'group by ' . implode(', ', $fieldsToGroup));
+
+			return $this;
+		}
+		
+		public function orderBy(array $fieldsToOrder)
+		{
+			$this->insertQuery('order', 0, 'order by ' . implode(', ', $fieldsToOrder));
+
+			return $this;
+		}
+
+		public function insert(string $table)
+		{
+			$this->setQueryType('insert');
+			$this->insertQuery('into', 0, 'into ' . $table);
+
+			return $this;
+		}
+
+		public function values(array $dataToInsert)
+		{
+			$fields = implode(', ', array_keys($dataToInsert));
+			$values = ':' . implode(', :', array_keys($dataToInsert));
+
+			while ($dataToInsert) {
+				$column = key($dataToInsert);
+				$value = array_shift($dataToInsert);
+
+				if (is_string($column)) {
+					$this->values[$column] = $value;
+				}
+			}
+
+			$this->insertQuery('fields', 0, '(' . $fields . ')');
+			$this->insertQuery('values', 0, 'values(' . $values . ')');
+
+			return $this;
+		}
+
+		public function delete(string $table)
+		{
+			$this->setQueryType('delete');
+			$this->from([$table]);
+
+			return $this;
+		}
+
+		public function update(string $table)
+		{
+			$this->setQueryType('update');
+			$this->insertQuery('table', 0, $table);
+
+			return $this;
+		}
+
+		public function set(array $fieldsToUpdate)
+		{
+			$fields = '';
+
+			while ($fieldsToUpdate) {
+				$column = key($fieldsToUpdate);
+				$value = array_shift($fieldsToUpdate);
+
+				if (is_string($column)) {
+					$fields .= ', ' . $column . ' = :' . $column;
+					$this->values[$column] = $value; 
+				}
+			}
+
+			$this->insertQuery('set', 0, 'set ' . substr($fields, 2));
+
+			return $this;
+		}
+
+		public function fetch(string $fetchType = null)
+		{
+			$queryType = $this->getQueryType();
+			$query = $this->queryToString();
+			$values = $this->getQueryValues();
+			$this->resetToDefault();
+
+			$satement = new Statement($this->getConnection());
+			$satement->compileQuery($queryType, $query, $values);
+
+			switch ($queryType) {
+				case 'select':
+					switch ($fetchType) {
+						case 'all':
+							return $satement->fetchAll();
+							break;
+						case 'object':
+							return $satement->fetchObject();
+							break;
+						case 'class':
+							if (class_exists($this->getEntity())) {
+								return $satement->fetchObject($this->getEntity());
+							}
+							break;
+						default:
+							return 'Undefined fetch type.';
+							break;
+					}
+					break;
+				default:
+					switch ($fetchType) {
+						case 'rowCount':
+							return $satement->rowCount();
+							break;
+						default:
+							return 'Undefined fetch type.';
+							break;
+					}
+					break;
+			}
+			
+			return false;
 		}
 
 		protected function setConnection(Connection $connection)
@@ -33,206 +291,6 @@
 			return $this->connection;
 		}
 
-		public function select(string $fields)
-		{
-			$this->setQueryType('select');
-			$this->concat('fields', ' ' . $fields);
-
-			return $this;
-		}
-
-		public function count(string $field)
-		{
-			$this->concat('count', '(' . $field . ')');
-
-			return $this;
-		}
-
-		public function first(int $quantity)
-		{
-			$this->concat('first', ' ' . $quantity);
-
-			return $this;
-		}
-
-		public function limit(int $quantity)
-		{
-			$this->first($quantity);
-
-			return $this;
-		}
-
-		public function skip(int $skipTo)
-		{
-			$this->concat('skip', ' ' . $skipTo);
-
-			return $this;
-		}
-
-		public function orderBy(array $order)
-		{
-			$orderString = '';
-
-			while ($order) {
-				$column = key($order);
-				$orderType = array_shift($order);
-
-				if (is_string($column)) {
-					$orderString .= ' ,' . $column . ' ' . $orderType;
-				}
-				else {
-					$orderString .= ' ,' . $orderType;
-				}
-			}
-
-			$this->concat('order by', ' ' . substr($orderString, 2));
-
-			return $this;
-		}
-
-		public function groupBy(string $fields)
-		{
-			$this->concat('group by', ' ' . $fields);
-
-			return $this;
-		}
-
-		public function values(array $dataToInsert)
-		{
-			$columns = implode(', ', array_keys($dataToInsert));
-			$columnsFormated = ':' . implode(', :', array_keys($dataToInsert));
-
-			while ($dataToInsert) {
-				$column = key($dataToInsert);
-				$value = array_shift($dataToInsert);
-
-				if (is_string($column)) {
-					$this->values[$column] = $value;
-				}
-			}
-
-			$this->concat('values', '(' . $columnsFormated . ')');
-
-			return $this;
-		}
-
-		public function insert(string $table)
-		{
-			$this->setQueryType('insert');
-			$this->concat('into', ' ' . $table);
-
-			return $this;
-		}
-
-		public function delete(string $table)
-		{
-			$this->setQueryType('delete');
-			$this->concat('from', ' ' . $table);
-
-			return $this;
-		}
-
-		public function from(string $tables)
-		{
-			$this->concat('from', ' ' . $tables);
-
-			return $this;
-		}
-
-		public function update(string $table)
-		{
-			$this->setQueryType('update');
-			$this->concat('table', ' ' . $table);
-
-			return $this;
-		}
-
-		public function set(array $valuesTuUpdate)
-		{
-			$columnsString = '';
-
-			while ($valuesTuUpdate) {
-				$column = key($valuesTuUpdate);
-				$value = array_shift($valuesTuUpdate);
-
-				if (is_string($column)) {
-					$columnsString .= ' ,' . $column . ' = :' . $column;
-					$this->values[$column] = $value; 
-				}
-			}
-
-			$this->concat('set', ' ' . substr($columnsString, 2));
-
-			return $this;
-		}
-
-		public function where(array $condition)
-		{
-			$conditionString = '';
-
-			while ($condition) {
-				$column = key($condition);
-				$value = array_shift($condition);
-
-				if (is_string($column)) {
-					if ($this->getQueryType() === 'select') {
-						$conditionString .= ' ' . $column . ' ?'; 
-						$this->values[] = $value;
-					}
-					else {
-						$columnRemoveSignal = strstr($column, ' ', true);
-						
-						$conditionString .= ' ' . $column . ' :' . $columnRemoveSignal;
-						$this->values[$columnRemoveSignal] = $value;
-					}
-				}
-				else {
-					$conditionString .= ' ' . $value;
-				}
-			}
-
-			$this->concat('where', $conditionString);
-
-			return $this;
-		}
-
-		public function whereNotExists(string $query)
-		{
-			$this->concat('where not exists', ' (' . $query . ')');
-
-			return $this;
-		}
-
-		public function fetch(string $fetchType = null)
-		{
-			$query = $this->mountQuery();
-
-			if ($query && $query->compiled()) {
-				$statement = $query->getStatement();
-
-				switch ($fetchType) {
-					case 'all':
-						return $statement->fetchAll();
-						break;
-					case 'object':
-						return $statement->fetchObject();
-						break;
-					case 'class':
-						if (class_exists($this->getEntity())) {
-							return $statement->fetchObject($this->getEntity());
-						}
-						break;
-					case 'rowCount':
-						return $statement->rowCount();
-						break;
-					default:
-						return $statement->fetchAll();
-						break;
-				}
-			}
-			return false;
-		}
-
 		protected function setEntity(string $entity)
 		{
 			$this->entity = $entity;
@@ -243,60 +301,64 @@
 			return $this->entity;
 		}
 
-		protected function mountQuery()
+		protected function queryToString()
 		{
-			switch ($this->getQueryType()) {
+			$queryType = $this->getQueryType();
+			$queryString = $queryType . ' ';
+
+			switch ($queryType) {
 				case 'select':
-					$order = [
-						'first', 'skip', 'count', 'fields', 'from', 'where', 'group by', 'order by'
-					];
+					$queryString .= ' ' . implode(' ', mergeSubArrays(
+						$this->parts[$queryType], 0, 2
+					));
+					$queryString .= ' ' . implode(', ', mergeSubArrays(
+						$this->parts[$queryType], 2, 6
+					));
+					$queryString .= ' ' . implode(', ', mergeSubArrays(
+						$this->parts[$queryType], 6, 7
+					));
+					$queryString .= ' ' . implode(' ', mergeSubArrays(
+						$this->parts[$queryType], 7, sizeof($this->parts[$queryType])
+					));
 					break;
-				case 'insert':
-					$order = ['into', 'values', 'where not exists'];
-					break;
-				case 'delete':
-					$order = ['from', 'where'];
-					break;
-				case 'update':
-					$order = ['table', 'set', 'where'];
+				default:
+					$queryString .= ' ' . implode(' ', mergeSubArrays(
+						$this->parts[$queryType], 0, sizeof($this->parts[$queryType])
+					));
 					break;
 			}
 
-			$statement = new Statement($this->getConnection());
-			$statement->compileQuery(
-				$this->getQueryType(), $this->mountQueryByOrder($order), $this->values
-			);
-			$this->resetToDefault();
-
-			return $statement;
+			return removeExtraSpaces($queryString);
 		}
 
-		protected function mountQueryByOrder(array $order)
+		protected function getQueryValues()
 		{
-			$query = $this->getQueryType();
-
-			foreach ($order as $identifier) {
-				if (isset($this->query[$this->getQueryType()][$identifier])) {
-					if ($identifier !== 'fields' && $identifier !== 'table') {
-						$query .= ' ' . $identifier;
-					}
-
-					$query .= $this->query[$this->getQueryType()][$identifier];
-				}
-			}
-
-			return $query;
+			return $this->values;
 		}
 
 		protected function resetToDefault()
 		{
-			unset($this->query[$this->getQueryType()]);
+			$this->parts = [
+	        	'select' => [
+	        		'first' => [], 'skip' => [], 'distinct' => [], 'sum' => [], 
+	        		'count' => [], 'fields' => [], 'from' => [], 'join' => [], 
+	        		'where' => [], 'group' => [], 'order' => []
+	        	],
+	        	'insert' => ['into' => [], 'fields' => [], 'values' => []],
+	        	'delete' => ['from' => [], 'where' => []],
+	        	'update' => ['table' => [], 'set' => [], 'where' => []]
+	    	];
 			$this->values = [];
 		}
 
-		protected function concat(string $identifier, string $query)
+		protected function insertQuery(string $partsIndex, $subIndex, string $query)
 		{
-			$this->query[$this->getQueryType()][$identifier] = $query;
+			if ($subIndex === '') {
+				$this->parts[$this->getQueryType()][$partsIndex][] = $query;
+			}
+			else {
+				$this->parts[$this->getQueryType()][$partsIndex][$subIndex] = $query;
+			}
 		}
 
 		protected function setQueryType(string $type)

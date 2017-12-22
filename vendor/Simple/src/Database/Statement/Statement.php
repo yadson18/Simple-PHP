@@ -2,6 +2,7 @@
 	namespace Simple\Database\Statement;
 
 	use PDOStatement;
+	use PDOException;
 	use PDO;
 
 	class Statement
@@ -17,7 +18,7 @@
 			$this->setPdo($pdo);
 		}
 
-		public function compiled()
+		protected function compiled()
 		{
 			return $this->compiled;
 		}
@@ -38,6 +39,33 @@
 			}
 		}
 
+		public function rowCount()
+		{
+			if ($this->compiled()) {
+				return $this->statement->rowCount();
+			}
+			return false;
+		}
+
+		public function fetchAll()
+		{
+			if ($this->compiled()) {
+				return $this->statement->fetchAll(PDO::FETCH_ASSOC);
+			}
+			return false;
+		}
+
+		public function fetchObject($object = null)
+		{
+			if ($this->compiled()) {
+				if (!empty($object)) {
+					return $this->statement->fetchObject($object);
+				}
+				return $this->statement->fetchObject();
+			}
+			return false;
+		}
+
 		protected function prepare(string $query)
 		{
 			try {
@@ -45,8 +73,8 @@
 
 				return true;
 			}
-			catch(PDOException $exception){
-				return false;
+			catch (PDOException $exception) {
+				echo $exception->getMessage();
 			}
 			return false;
 		}
@@ -71,8 +99,8 @@
 						}
 					}
 				}
-				catch(PDOException $exception){
-					return false;
+				catch (PDOException $exception) {
+					return $exception->getMessage();
 				}
 			}
 			return false;
@@ -86,20 +114,12 @@
 
 					return true;
 				}
-				catch(PDOException $exception){
-					return false;
+				catch (PDOException $exception) {
+					return $exception->getMessage();
 				}
 			}
 			return false;
 		} 
-
-		protected function isPdoStatement($statement)
-		{
-			if ($statement instanceof PDOStatement) {
-				return true;
-			}
-			return false;
-		}
 
 		protected function setPdo(PDO $pdo){
 			$this->pdo = $pdo;
@@ -109,10 +129,10 @@
 			return $this->pdo;
 		}
 
-		public function getStatement()
+		protected function isPdoStatement($statement)
 		{
-			if ($this->statement instanceof PDOStatement) {
-				return $this->statement;
+			if ($statement instanceof PDOStatement) {
+				return true;
 			}
 			return false;
 		}

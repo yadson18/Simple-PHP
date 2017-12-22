@@ -1,6 +1,7 @@
 <?php 
 	namespace Simple\Database\Drivers;
 
+	use PDOException;
 	use PDO;
 
 	abstract class PDODriver
@@ -39,8 +40,8 @@
 
 					return $pdo;
 				}
-				catch(PDOException $exception){
-					return false;
+				catch (PDOException $exception) {
+					echo $exception->getMessage();
 				}
 			}
 			return false;

@@ -4,6 +4,7 @@
 		<title><?= $this->fetch('appName') . $this->fetch('title') ?></title>
 
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<link rel='icon' type='image/ico' href='logo.png'/>
 		<?= $this->Html->encoding() ?>
 
 		<?= $this->Html->css('bootstrap.min.css') ?>
