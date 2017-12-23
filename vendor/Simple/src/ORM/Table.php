@@ -126,17 +126,15 @@
 			return false;
 		}
 
-		/*public function delete(EntityInterface $entity) 
+		public function remove(EntityInterface $entity) 
 		{
-			if (isset($this->queryBuilder)) {
-				$primaryKey = $this->getPrimaryKey();
+			$primaryKey = $this->getPrimaryKey();
 
-				if (isset($entity->$primaryKey)) {
-					return $this->queryBuilder->delete($this->getTable())
-						->where([$primaryKey . ' = ' => $entity->$primaryKey])
-						->fetch('rowCount');
-				}
+			if (isset($entity->$primaryKey) && !empty($this->getTable())) {
+				return $this->delete($this->getTable())
+					->where([$primaryKey . ' = ' => $entity->$primaryKey])
+					->fetch('rowCount');
 			}
 			return false;
-		}*/
+		}
 	}
