@@ -15,9 +15,9 @@
 		
 		private $primaryKey;
 
-		public function __construct(string $driverName, string $databaseName)
+		public function setDatabase(string $driverName, string $databaseName)
 		{
-			parent::__construct($driverName, $databaseName, $this->getEntityName());
+			$this->configureDatabase($driverName, $databaseName, $this->getEntityName());
 		}
 
 		public function newEntity()

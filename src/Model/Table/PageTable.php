@@ -5,13 +5,10 @@
 
 	class PageTable extends Table
 	{
-		public function __construct()
-		{
-			parent::__construct('Firebird', 'SRICASH');
-		}
-		
 		public function initialize()
 		{
+			$this->setDatabase('Firebird', 'SRICASH');
+
 			$this->setTable('CADASTRO');
 
 			$this->setPrimaryKey('cod_cadastro');
