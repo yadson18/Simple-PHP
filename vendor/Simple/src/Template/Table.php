@@ -1,7 +1,7 @@
 <?php  
 	namespace App\Model\Table;
 
-	use Simple\Validation\Validator;
+	use Simple\ORM\Components\Validator;
 	use Simple\ORM\Table;
 
 	class %table_name%Table extends Table

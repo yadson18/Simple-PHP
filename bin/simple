@@ -221,7 +221,7 @@ if [ $# -eq 3 ] && [ "$1" == mclasses ] && [ "$2" != "" ] && [ "$3" != "" ]; the
 			done
 			
 			ControllerClass=$(makeClassController $tableName);
-			TableClass=$(makeClassTable $tableName "$attributes" firebird $databaseName $primaryKeys);
+			TableClass=$(makeClassTable $tableName "$attributes" Firebird $databaseName $primaryKeys);
 			EntityClass=$(makeClassEntity $tableName);
 			ViewDirectoryClass=$(makeViewDir $tableName);
 

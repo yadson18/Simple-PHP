@@ -1,8 +1,8 @@
 <?php 
 	namespace Simple\ORM\Components;
 
-	use Simple\ORM\Component\Validator\Validator;
 	use Simple\Database\Statement\Statement;
+	use Simple\ORM\Components\Validator;
 	use Simple\Database\Connection;
 	
 	class QueryBuilder

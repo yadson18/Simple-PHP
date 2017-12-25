@@ -24,9 +24,7 @@ WITH VALIDATOR_METHOD AS(
             ELSE 'unknown'
         END AS TYPE,
         
-        F.RDB$FIELD_LENGTH AS SIZE,
-        
-        R.RDB$DEFAULT_SOURCE AS DEFAULT_VALUE
+        F.RDB$FIELD_LENGTH AS SIZE
         
     FROM RDB$RELATION_FIELDS R
         LEFT JOIN RDB$FIELDS F ON R.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME
@@ -55,10 +53,6 @@ SELECT REPLACE(
     '$validator->addRule(''' || COLUMNS || ''')->' || 
     IS_NULL || '()->' ||
     TYPE || '()->' ||
-    'size(' || SIZE || ')->' ||
-    CASE 
-        WHEN DEFAULT_VALUE IS NULL THEN 'defaultValue('''');'
-        ELSE 'defaultValue(' || REPLACE(REPLACE(DEFAULT_VALUE, 'DEFAULT', ''), '''', '''') || ');'
-    END, ' ', ''
+    'size(' || SIZE || ');', ' ', ''
 ) AS METHODS
 FROM VALIDATOR_METHOD;
