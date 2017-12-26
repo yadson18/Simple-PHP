@@ -7,21 +7,21 @@ WITH VALIDATOR_METHOD AS(
         END AS IS_NULL,
         
         CASE F.RDB$FIELD_TYPE 
-            WHEN 7 THEN 'integer'
-            WHEN 8 THEN 'integer'
+            WHEN 7 THEN 'int'
+            WHEN 8 THEN 'int'
             WHEN 9 THEN 'string'
             WHEN 10 THEN 'float'
             WHEN 11 THEN 'float'
             WHEN 12 THEN 'string'
             WHEN 13 THEN 'string'
             WHEN 14 THEN 'string'
-            WHEN 16 THEN 'integer'
-            WHEN 27 THEN 'double'
+            WHEN 16 THEN 'int'
+            WHEN 27 THEN 'float'
             WHEN 35 THEN 'string'
             WHEN 37 THEN 'string'
             WHEN 40 THEN 'string'
             WHEN 261 THEN 'string'
-            ELSE 'unknown'
+            ELSE 'string'
         END AS TYPE,
         
         F.RDB$FIELD_LENGTH AS SIZE

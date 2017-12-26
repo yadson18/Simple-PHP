@@ -26,7 +26,7 @@
 			return $this;
 		}
 
-		public function integer()
+		public function int()
 		{
 			$this->addSubRule('type', 'integer');
 
@@ -47,13 +47,6 @@
 			return $this;
 		}
 
-		public function double()
-		{
-			$this->addSubRule('type', 'double');
-
-			return $this;
-		}
-
 		public function unknown()
 		{
 			$this->addSubRule('type', 'unknown');
@@ -70,24 +63,17 @@
 
 		public function validateRules(array $rulesAndValues)
 		{
-			$validated = false;
-
 			foreach ($rulesAndValues as $column => $value) {
-				if (is_string($column) && 
-					$this->validateRule($column, $value)
-				) {	
-
-					if ($validated !== true) {
-						$validated = true;
+				if (is_string($column)) {
+					if (!$this->validateRule($column, $value)) {
+						return false;
 					}
 				}
 				else {
-					$validated = false;
-					break;
+					return false;
 				}
 			}
-
-			return $validated;
+			return true;
 		}
 
 		protected function validateRule(string $ruleName, $value)
@@ -102,9 +88,7 @@
 						!empty($value) && $rule['null'] === false ||
 						empty($value) && $rule['null'] === true 
 					) {
-						if (!empty($value) && 
-							eval("return is_{$rule['type']}(\$value);")
-						) {
+						if (!empty($value) && settype($value, $rule['type'])) {
 							if (strlen((string) $value) <= $rule['size']) {
 								return true;
 							}

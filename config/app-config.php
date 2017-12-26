@@ -15,8 +15,8 @@
 
 		->set('Routes', [
 			'default' => [
-				'controller' => 'Page', 
-				'view' => 'home'
+				'controller' => 'Ibge', 
+				'view' => 'update'
 			]
 		])
 
