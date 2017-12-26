@@ -1,10 +1,11 @@
 <?php 
+	require_once 'routes.php';
+
 	use Simple\Configurator\Configurator;
 
 	$config = Configurator::getInstance();
-
-	$config
 	
+	$config
 		->set('App', [
 			'name' => 'Simple - ',
 			'displayErrors' => true,
@@ -12,14 +13,6 @@
 			'timezone' => 'UTC',
 			'locate' => 'pt-Br'
 		])
-
-		->set('Routes', [
-			'default' => [
-				'controller' => 'Page', 
-				'view' => 'home'
-			]
-		])
-
 		->set('Email', [
 			'default' => [
 				'host' => 'smtp.gmail.com',
@@ -29,7 +22,6 @@
 				'security' => 'tls'
 			]
 		])
-
 		->set('Databases', [
 			'Firebird' => [
 				'SRICASH' => [
@@ -41,7 +33,6 @@
 				]
 			]
 		])
-
 		->set('Webservice', [
 			'url' => "http://examplews.com/soap",
 			'configs' => [

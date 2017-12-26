@@ -225,19 +225,34 @@ if [ $# -eq 3 ] && [ "$1" == mclasses ] && [ "$2" != "" ] && [ "$3" != "" ]; the
 			EntityClass=$(makeClassEntity $tableName);
 			ViewDirectoryClass=$(makeViewDir $tableName);
 
+			echo "Wait a moment...";
+
 			if [ "$ControllerClass" -eq 1 ]; then 
+				echo "Controller: "$tableName"Controller -> status (OK)";
+
 				if [ "$TableClass" -eq 1 ]; then
+					echo "Table: "$tableName"Table -> status (OK)";
+
 					if [ "$EntityClass" -eq 1 ]; then
+						echo "Entity: "$tableName" -> status (OK)";
+
 						if [ "$ViewDirectoryClass" -eq 1 ]; then
-							echo "ok";
+							echo "Directory Template: "$tableName" -> status (OK)";
+						else 
+							echo "Directory Template: "$tableName" -> status (ERROR)";
 						fi
+					else 
+						echo "Entity: "$tableName" -> status (ERROR)";
 					fi
 				else
-					echo "fail";
+					echo "Table: "$tableName"Table -> status (ERROR)";
 				fi
+			else 
+				echo "Controller: "$tableName"Controller -> status (ERROR)";
 			fi
 		fi
 	fi
 else
-	echo "Não foi possível executar esta ação.";
+	echo "Wrong option, try again.";
+	echo "Avaliable option (mclasses)";
 fi
