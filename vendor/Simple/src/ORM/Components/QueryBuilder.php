@@ -90,6 +90,13 @@
 			return $this;
 		}
 
+		public function limit(int $limit)
+		{
+			$this->first($limit);
+
+			return $this;
+		}
+
 		public function distinct(string $fieldToDistinct)
 		{
 			$this->insertQuery('distinct', 0, 'distinct(' . $fieldToDistinct . ')');
@@ -239,13 +246,14 @@
 
 		public function fetch(string $fetchType = null)
 		{
+			$validator = $this->defaultValidator(new Validator());
 			$queryType = $this->getQueryType();
 			$query = $this->queryToString();
 			$values = $this->getQueryValues();
 			$this->resetToDefault();
 
 			$satement = new Statement($this->getConnection());
-			$satement->compileQuery($queryType, $query, $values);
+			$satement->compileQuery($queryType, $query, $values, $validator);
 
 			switch ($queryType) {
 				case 'select':

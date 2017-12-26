@@ -5,34 +5,6 @@
 	{
 		private $rules = [];
 
-		public function validateRule(string $ruleName, $value)
-		{
-			if (isset($this->rules[$ruleName])) {
-				foreach ($this->rules[$ruleName] as $rule => $ruleValue) {
-					switch ($rule) {
-						case 'null':
-							if (empty($value) && $ruleValue === false) {
-								return false; 	
-							} 
-							break;
-						case 'type':
-							if (!empty($value)) {
-								if (!eval("return is_{$ruleValue}(\$value);")) {
-									return false;
-								}
-							}
-							break;
-						case 'size':
-							if (strlen('' . ((string) $value)) > $ruleValue) {
-								return false;
-							}
-							break;
-					}
-				}
-			}
-			return true;
-		}
-
 		public function addRule(string $ruleName)
 		{
 			$this->rules[$ruleName] = [];
@@ -94,6 +66,52 @@
 			$this->addSubRule('size', $size);
 
 			return $this;
+		}
+
+		public function validateRules(array $rulesAndValues)
+		{
+			$validated = false;
+
+			foreach ($rulesAndValues as $column => $value) {
+				if (is_string($column) && 
+					$this->validateRule($column, $value)
+				) {	
+					if ($validated !== true) {
+						$validated = true;
+					}
+				}
+				else {
+					$validated = false;
+					break;
+				}
+			}
+
+			return $validated;
+		}
+
+		protected function validateRule(string $ruleName, $value)
+		{
+			if (isset($this->rules[$ruleName])) {
+				$rule = $this->rules[$ruleName];
+
+				if (isset($rule['null']) && isset($rule['type']) && 
+					isset($rule['size'])
+				) {
+					if (!empty($value) && $rule['null'] === true || 
+						!empty($value) && $rule['null'] === false ||
+						empty($value) && $rule['null'] === true 
+					) {
+						if (!empty($value) && 
+							eval("return is_{$rule['type']}(\$value);")
+						) {
+							if (strlen((string) $value) <= $rule['size']) {
+								return true;
+							}
+						}	
+					}
+				}
+			}
+			return false;
 		}
 
 		protected function addSubRule(string $subRuleName, $data)

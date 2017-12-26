@@ -1,7 +1,8 @@
 <?php 
 	namespace Simple\Database\Statement;
 
-	use PDOStatement;
+	use Simple\ORM\Components\Validator;
+	use PDOStatement;	
 	use PDOException;
 	use PDO;
 
@@ -23,18 +24,25 @@
 			return $this->compiled;
 		}
 
-		public function compileQuery(string $queryType, string $query, array $values)
+		public function compileQuery(
+			string $queryType, string $query, array $values, Validator $validator
+		)
 		{
-			if ($this->getPdo() && !empty($query)) {
-				if ($this->prepare($query)) {
-					if (!empty($values) && $this->bind($queryType, $values)) {
-						if ($this->execute()) {
+			if ($this->getPdo() && !empty($query) && $this->prepare($query)) {
+				if (!empty($values)) {
+					if ($queryType !== 'select') {
+						if ($validator->validateRules($values) &&
+							$this->bind($queryType, $values) && $this->execute()
+						) {
 							$this->compiled = true;
 						}
 					}
-					else if ($this->execute()) {
+					else if ($this->bind($queryType, $values) && $this->execute()) {
 						$this->compiled = true;
 					}
+				}
+				else if ($this->execute()) {
+					$this->compiled = true;
 				}
 			}
 		}
@@ -84,20 +92,18 @@
 			if ($this->isPdoStatement($this->statement) && !empty($values)) {
 				try {
 					foreach ($values as $column => $value) {
-						if ($queryType === 'select') {
-							if (!$this->statement->bindValue(++$column, $value)) {
-								return false;
-							}
+						if ($queryType === 'select' &&
+							!$this->statement->bindValue(++$column, $value)
+						) {
+							return false;
 						}
-						else if ($queryType !== 'select') {
-							if (!$this->statement->bindValue(':' . $column, $value)) {
-								return false;
-							}
-						}
-						else {
-							return true;
+						else if ($queryType !== 'select' && 
+							!$this->statement->bindValue(':' . $column, $value)
+						) {
+							return false;
 						}
 					}
+					return true;
 				}
 				catch (PDOException $exception) {
 					return $exception->getMessage();
