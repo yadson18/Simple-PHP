@@ -224,32 +224,37 @@ if [ $# -eq 3 ] && [ "$1" == mclasses ] && [ "$2" != "" ] && [ "$3" != "" ]; the
 			TableClass=$(makeClassTable $tableName "$attributes" Firebird $databaseName $primaryKeys);
 			EntityClass=$(makeClassEntity $tableName);
 			ViewDirectoryClass=$(makeViewDir $tableName);
+			className=$(getClassName $tableName);
 
-			echo "Wait a moment...";
+			echo "========================================================";
+			echo "=                     CLASS CREATOR                    =";
+			echo -e "========================================================\n";
 
 			if [ "$ControllerClass" -eq 1 ]; then 
-				echo "Controller: "$tableName"Controller -> status (OK)";
+				echo -e " - Controller: "$className"Controller -> created (YES)    \n";
 
 				if [ "$TableClass" -eq 1 ]; then
-					echo "Table: "$tableName"Table -> status (OK)";
+					echo -e " - Table: "$className"Table -> created (YES)              \n";
 
 					if [ "$EntityClass" -eq 1 ]; then
-						echo "Entity: "$tableName" -> status (OK)";
+						echo -e " - Entity: "$className" -> created (YES)                  \n";
 
 						if [ "$ViewDirectoryClass" -eq 1 ]; then
-							echo "Directory Template: "$tableName" -> status (OK)";
+							echo " - Directory Template: "$className" -> created (YES)      ";
 						else 
-							echo "Directory Template: "$tableName" -> status (ERROR)";
+							echo " - Directory Template: "$className" -> created (NO)   ";
 						fi
 					else 
-						echo "Entity: "$tableName" -> status (ERROR)";
+						echo -e " - Entity: "$className" -> created (NO)               \n";
 					fi
 				else
-					echo "Table: "$tableName"Table -> status (ERROR)";
+					echo -e " - Table: "$className"Table -> created (NO)           \n";
 				fi
 			else 
-				echo "Controller: "$tableName"Controller -> status (ERROR)";
+				echo -e " - Controller: "$className"Controller -> created (NO) \n";
 			fi
+
+			echo -e "\n========================================================";
 		fi
 	fi
 else
