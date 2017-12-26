@@ -76,6 +76,7 @@
 				if (is_string($column) && 
 					$this->validateRule($column, $value)
 				) {	
+
 					if ($validated !== true) {
 						$validated = true;
 					}

@@ -8,19 +8,17 @@
 	{
 		public function initialize()
 		{
-			$this->setDatabase('Firebird', 'SRICASH');
+			$this->setDatabase('DatabaseType', 'Example');
 
-			$this->setTable('CADASTRO');
+			$this->setTable('TableName');
 
-			$this->setPrimaryKey('cod_cadastro');
+			$this->setPrimaryKey('id');
 
 			$this->setBelongsTo('', []);
 		}
 
 		public function defaultValidator(Validator $validator)
 		{
-			$validator->addRule('cod_cadastro')->notEmpty()->integer()->size(5);
-
 			return $validator;
 		}
 	}
