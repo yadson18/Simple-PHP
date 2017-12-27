@@ -5,7 +5,6 @@
 	use Simple\Http\Request;
 	use Simple\Util\Builder;
 	use Simple\View\View;
-	use stdClass;
 
 	class Response
 	{

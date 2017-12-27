@@ -3,70 +3,109 @@
     
     class Form
     {
-        private static $defaultOptions = [
-            'form' => [
-                'method' => 'POST'
+        private static $tags = [
+            'button' => [
+                'options' => ['type' => 'submit', 'class' => 'btn btn-default'],
+                'tag' => '<button %options%>%name%</button>'
             ],
             'input' => [
-                'type' => 'text', 'class' => 'form-control'
+                'options' => ['type' => 'text', 'class' => 'form-control'],
+                'tag' => '<input %options%/>'
             ],
-            'button' => [
-                'type' => 'submit', 'class' => 'btn btn-default', 
-            ]
+            'select' => [
+                'options' => ['class' => 'form-control'],
+                'tag' => '<select %options%>%tags%</select>'
+            ],
+            'option' => ['tag' => '<option value="%value%">%name%</option>'],  
+            'label' => ['tag' => '<label>%name%</label>'],
+            'formStart' => ['tag' => '<form %options%>'],
+            'formEnd' => ['tag' => '</form>']
         ];
 
         public function input(string $labelName, array $options = [])
         {
-            $options = $this->mergeOptions('input', $options);
-            if (!isset($options['name'])) {
-                $options['name'] = strtolower($labelName);
-            }
-            if (!isset($options['id'])) {
-                $options['id'] = strtolower($labelName);
+            return $this->label($labelName) . 
+                $this->replaceProperties('input', [
+                    '%options%' => $this->mountOptions($this->mixOptions(
+                        'input', array_merge([
+                            'name' => strtolower($labelName),
+                            'id' => strtolower($labelName)
+                        ], $options)
+                    ))
+                ]);
+        }
+
+        public function select(string $labelName, array $options = [])
+        {
+            if (isset($options['options'])) {
+                $optionsTags = '';
+
+                foreach ($options['options'] as $name => $value) {
+                    $optionsTags .= $this->option($name, $value);
+                }
+                unset($options['options']);
+
+                return $this->label($labelName) . 
+                    $this->replaceProperties('select', [
+                        '%tags%' => $optionsTags,
+                        '%options%' => $this->mountOptions($this->mixOptions(
+                            'select', array_merge([
+                                'name' => strtolower($labelName),
+                                'id' => strtolower($labelName)
+                            ], $options)
+                        ))
+                    ]);
             }
 
-            return $this->div(
-                $this->mountBlock([
-                    $this->label($labelName), '<input' . $this->mountOptions($options) . '/>'
-                ])
-            );
+        }
+
+        protected function option($name, $value)
+        {
+            return $this->replaceProperties('option', [
+                '%value%' => $value,
+                '%name%' => $name
+            ]);
         }
 
         public function button(string $buttonName, array $options = [])
         {
-            $options = $this->mergeOptions('button', $options);
-            if (!isset($options['id'])) {
-                $options['id'] = strtolower($buttonName);
-            }
-
-            return $this->div(
-                '<button' . $this->mountOptions($options) . '>' . $buttonName . '</button>'
-            );
+            return $this->replaceProperties('button', [
+                '%name%' => $buttonName,
+                '%options%' => $this->mountOptions($this->mixOptions(
+                    'button', array_merge([
+                        'id' => strtolower($buttonName)
+                    ], $options)
+                ))
+            ]);
         }
 
         public function start(array $options = [])
         {
-            return '<form' . $this->mountOptions($this->mergeOptions('form', $options)) . '>';
+            return $this->replaceProperties('formStart', [
+                '%options%' => $this->mountOptions($options)
+            ]);
         }
 
         public function end()
         {
-            return '</form>';
+            return $this->replaceProperties('formEnd', []);
         }
 
         protected function label(string $name)
         {
-            return '<label>' . $name . '</label>';
+            return $this->replaceProperties('label', ['%name%' => $name]);
         }
 
-        protected function div(string $elements)
+        protected function mixOptions(string $elementName, array $options)
         {
-            return '<div class="form-group">' . $elements . '</div>';
+            return array_merge($this->getOptions($elementName), $options);
         }
 
-        protected function mergeOptions(string $elementName, array $options)
+        protected function getOptions(string $elementName)
         {
-            return array_merge($this->getDefaultOptions($elementName), $options);
+            if (isset(static::$tags[$elementName]['options'])) {
+                return static::$tags[$elementName]['options'];
+            }
         }
 
         protected function mountOptions(array $options)
@@ -74,20 +113,17 @@
             $elementOptions = '';
 
             foreach ($options as $attribute => $value) {
-                $elementOptions .= ' ' . $attribute . '="' . $value . '"';
+                if (is_string($attribute)) {
+                    $elementOptions .= ' ' . $attribute . '="' . $value . '"';
+                }
             }
-            return $elementOptions;
+            return substr($elementOptions, 1);
         }
 
-        protected function mountBlock(array $blocks)
+        protected function replaceProperties(string $tag, array $properties)
         {
-            return implode($blocks);
-        }
-        
-        protected function getDefaultOptions(string $elementName)
-        {
-            if (isset(static::$defaultOptions[$elementName])) {
-                return static::$defaultOptions[$elementName];
+            if (isset(static::$tags[$tag]['tag'])) {
+                return replaceRecursive(static::$tags[$tag]['tag'], $properties);
             }
         }
     }

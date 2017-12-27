@@ -4,6 +4,7 @@
 	use Simple\Controller\Interfaces\ControllerInterface;
 	use Simple\Controller\Component;
 	use Simple\ORM\TableRegistry;
+	use Simple\Routing\Router;
 	use Simple\Http\Request;
 	use Simple\View\View;
 
@@ -17,66 +18,66 @@
 
 		private $view;
 
-		private $component;
+		private $components = [];
 
 		public function initialize(Request $request, View $view)
 		{
-			$this->component = new Component();
-			
 			$this->request = $request;
 			
 			$this->view = $view;
 
-			$this->loadTables();
+			$this->initializeTables();
 		}
 
-		protected function loadTables()
+		public function getComponents()
 		{
-			$tableName = replace(splitNamespace(get_class($this)), 'Controller', '');
+			return $this->components;
+		}
+
+		public function setTitle(string $title)
+		{
+			$this->view->setTitle($title);
+		}
+
+		public function setViewVars(array $viewVars)
+		{
+			$this->view->setViewVars($viewVars);
+		}
+
+		public function redirect($route)
+        {
+        	if (is_array($route)) {
+        		if (isset($route['controller']) && !empty($route['controller'])) {
+	        		if (!isset($route['view']) || empty($route['view'])) {
+	        			$route['view'] = 'index';
+					}
+					
+	        		return ['redirect' => implode('/', $route)];
+	        	}
+        	}
+        	else if (is_string($route)) {
+        		return ['redirect' => implode('/', Router::getRoute($route))];
+        	}
+        	return false;
+		}
+
+		public function loadComponent(string $componentName)
+		{
+			$component = new Component();
+
+			if ($component->register($componentName)) {
+				$this->components[$componentName] = $component->getComponent();
+				$this->$componentName = $component->getComponent();
+			}
+		}
+
+		public function initializeTables()
+		{
+			$tableName = replace(removeNamespace($this), 'Controller', '');
 			$table = TableRegistry::get($tableName);
 
 			if (!empty($table)) {
 				$this->$tableName = $table;
 			}
-		}
-
-		protected function loadComponent(string $componentName)
-		{
-			$this->component->register($componentName);
-			
-			foreach ($this->getComponents() as $component => $instance) {
-				$this->$component = $instance;
-			}
-		}
-
-		public function getComponents()
-		{
-			return $this->component->getRegistryComponents();
-		}
-
-		protected function setTitle(string $title)
-		{
-			$this->view->setTitle($title);
-		}
-
-		protected function setViewVars(array $viewVars)
-		{
-			$this->view->setViewVars($viewVars);
-		}
-
-		protected function redirect($route)
-        {
-        	if (is_array($route)) {
-	        	if (isset($route['controller']) && !empty($route['controller'])) {
-	        		if (isset($route['view']) && !empty($route['view'])) {
-	        			return ['redirect' => $route['controller'] . '/' . $route['view']];
-	        		}
-	        		return ['redirect' => $route['controller'] . '/index'];
-	        	}
-        	}
-        	else if (is_string($route)) {
-        		return ['redirect' => $route];
-        	}
-        	return false;
 		}
 	}

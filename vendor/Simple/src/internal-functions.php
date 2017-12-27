@@ -1,4 +1,9 @@
 <?php 
+	function removeNamespace($object)
+	{
+		return splitNamespace(get_class($object));
+	}
+
 	function arrayDeepSearch(array $keys, array $array)
 	{
 		while ($keys) {

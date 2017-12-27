@@ -9,27 +9,26 @@
 
 		const SUFIX = 'Component';
 
-		private $componentsRegistry = [];
-
-		private $componentName;
+		private $component;
 
 		public function register(string $componentName)
 		{
-			$component = Component::NAMESPACE . $componentName . Component::SUFIX;
+			$componentName = Component::NAMESPACE . $componentName . Component::SUFIX;
 
-			if ($this->componentExists($component)) {
-				$this->setComponent($componentName, new ReflectionClass($component));
+			if ($this->componentExists($componentName)) {
+				$component = new ReflectionClass($componentName);
+				$this->component = $component->newInstance();
+
+				return true;
 			}
+			$this->component = null;
+			
+			return false;
 		}
 
-		public function getRegistryComponents()
+		public function getComponent()
 		{
-			return $this->componentsRegistry;
-		}
-
-		protected function setComponent(string $componentName, ReflectionClass $component)
-		{
-			$this->componentsRegistry[$componentName] = $component->newInstance();
+			return $this->component;
 		}
 
 		protected function componentExists(string $componentName)

@@ -16,7 +16,7 @@
 			$this->loadComponent('Flash');
 		}	
 
-		protected function alowedMethods(string $method, array $methods)
+		public function alowedMethods(string $method, array $methods)
         {
             if (in_array($method, $methods)) {
                 return true;
