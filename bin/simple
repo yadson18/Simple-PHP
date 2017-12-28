@@ -79,7 +79,7 @@ function makeClassEntity(){
 }
 
 function makeClassTable(){
-	if [ $# -eq 5 ]; then
+	if [ $# -eq 4 ]; then
 		tableName=$1;
 		tableAttributes=$2;
 		databaseProfile=$3;
