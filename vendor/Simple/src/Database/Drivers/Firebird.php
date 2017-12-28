@@ -7,27 +7,21 @@
 	{
 		private static $dsn = 'firebird:dbname=%host%:%path%; charset=%encode%';
 
-		public function __construct(array $driverConfigs)
+		public function __construct(array $configs)
 		{
-			parent::__construct($driverConfigs);
+			$this->setPdoConfigs($this->mountPdoConfig($configs));
 		}
 
-		public function connectInto(string $databaseName)
+		protected function mountPdoConfig(array $configs)
 		{
-			$config = $this->getDatabaseConfig($databaseName);
-
-			if ($config) {
-				$connectionConfig = [
-					'dsn' => replaceRecursive(static::$dsn, [
-						'%host%' => $config['host'],
-						'%path%' => $config['path'],
-						'%encode%' => $config['encoding']
-					]),
-					'user' => $config['user'],
-					'password' => $config['password']
-				];
-
-				return $this->connect($connectionConfig);
-			}
+			return [
+				'dsn' => replaceRecursive(static::$dsn, [
+					'%host%' => $configs['host'],
+					'%path%' => $configs['path'],
+					'%encode%' => $configs['encoding']
+				]),
+				'user' => $configs['user'],
+				'password' => $configs['password']
+			];
 		}
 	}	

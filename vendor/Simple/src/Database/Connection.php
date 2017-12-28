@@ -4,21 +4,21 @@
 	use Simple\Database\Driver;
 	use PDO;
 
-	class Connection
+	class Connection  
 	{
 		private $connection;
 
-		public function __construct(string $driverName, string $databaseName)
-		{
-			$this->connect(new Driver($driverName), $databaseName);
+		public function __construct(string $databaseProfile)
+		{	
+			$this->connect(new Driver($databaseProfile));
 		}
 
-		protected function connect(Driver $driver, string $databaseName)
+		protected function connect(Driver $driver)
 		{
 			$driver = $driver->getDriver();
 
-			if (is_callable([$driver, 'connectInto'])) {
-				$this->setConnection($driver->connectInto($databaseName));
+			if (is_callable([$driver, 'connect'])) {
+				$this->setConnection($driver->connect());
 			}
 		}
 

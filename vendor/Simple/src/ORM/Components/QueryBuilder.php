@@ -47,9 +47,9 @@
 
 		private $values = [];
 
-		public function configureDatabase(string $driverName, string $databaseName, string $entity)
+		public function configureDatabase(string $databaseProfile, string $entity)
 		{
-			$this->setConnection(new Connection($driverName, $databaseName));
+			$this->setConnection(new Connection($databaseProfile));
 			$this->setEntity($entity);
 		}
 

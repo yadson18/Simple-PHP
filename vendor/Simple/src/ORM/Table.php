@@ -15,9 +15,9 @@
 		
 		private $primaryKey;
 
-		public function setDatabase(string $driverName, string $databaseName)
+		public function setDatabase(string $databaseProfile)
 		{
-			$this->configureDatabase($driverName, $databaseName, $this->getEntityName());
+			$this->configureDatabase($databaseProfile, $this->getEntityName());
 		}
 
 		public function newEntity()

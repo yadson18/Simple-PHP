@@ -8,16 +8,16 @@
 	{
 		public function initialize()
 		{
-			$this->setDatabase('DatabaseType', 'Example');
+			$this->setDatabase('default');
 
-			$this->setTable('TableName');
+			$this->setTable('tableName');
 
 			$this->setPrimaryKey('id');
 
 			$this->setBelongsTo('', []);
 		}
 
-		public function defaultValidator(Validator $validator)
+		protected function defaultValidator(Validator $validator)
 		{
 			return $validator;
 		}

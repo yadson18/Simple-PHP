@@ -11,25 +11,34 @@
 
 		private $driver;
 
-		public function __construct(string $driverName)
+		public function __construct(string $databaseProfile)
 		{
-			$this->setDriver($driverName);
+			$configs = $this->getDriverConfig($databaseProfile);
+
+			if ($configs && isset($configs['driver'])) {
+				$driver = $configs['driver'];
+
+				$this->setDriver($driver, $configs);
+			}
 		}
 
-		protected function setDriver(string $driverName)
+		protected function setDriver(string $driverName, array $configs)
 		{
-			$driverConfig = find_array_values($driverName, static::$driversConfigs);
+			$driver = new Builder(Driver::NAMESPACE . $driverName, [$configs]);
 
-			if (!empty($driverConfig)) {
-				$driver = new Builder(Driver::NAMESPACE . $driverName, [$driverConfig]);
-
-				$this->driver = $driver->getBuiltInstance();
-			}
+			$this->driver = $driver->getBuiltInstance();
 		}
 
 		public function getDriver()
 		{
 			return $this->driver;
+		}
+
+		protected function getDriverConfig(string $databaseProfile)
+		{
+			if (isset(static::$driversConfigs[$databaseProfile])) {
+				return static::$driversConfigs[$databaseProfile];
+			}
 		}
 
 		public static function configDrivers(array $driversConfigs)

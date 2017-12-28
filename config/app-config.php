@@ -1,40 +1,85 @@
 <?php 
+	/**
+	 * System configurations.
+	 */
+
 	require_once 'routes.php';
 
 	use Simple\Configurator\Configurator;
 
 	$config = Configurator::getInstance();
-	
+
 	$config
+
+		/**
+		 * App configurations.
+		 *
+		 * (@string) name - The application name.
+		 * (@string) encoding - Application default encoding.
+		 * (@string) timezone - Application default time zone.
+		 * (@string) locate - Application default locate.
+		 * (@boolean) displayErrors - 
+		 *		(true) System will shown errors and warnings.
+		 *		(false) Errors or warnings turn off.
+		 */
 		->set('App', [
-			'name' => 'Simple - ',
-			'displayErrors' => true,
-			'encoding' => 'utf-8',
-			'timezone' => 'UTC',
-			'locate' => 'pt-Br'
+			'name' => 'Simple - ', 	 
+			'encoding' => 'utf-8',	 
+			'timezone' => 'UTC',	 
+			'locate' => 'pt-Br',		 
+			'displayErrors' => true
 		])
+
+		/**
+		 * Email configurations.
+		 * 
+		 * (@array) default - Default email configuration.
+		 * 		(@string) host - Email host.
+		 *		(@int) port - The email host port.
+		 *		(@string) security - The email host protocol.
+		 *		(@string) email - Your email.
+		 *		(@string) password - Your email password.
+		 */ 
 		->set('Email', [
 			'default' => [
-				'host' => 'smtp.gmail.com',
-				'port' => 587,
-				'email' => 'example@email.com',
-				'password' => 'secret',
-				'security' => 'tls'
+				'host' => 'smtp.gmail.com',		 
+				'port' => 587,					 
+				'security' => 'tls',			 
+				'email' => 'example@email.com', 
+				'password' => 'secret'			 
 			]
 		])
+
+		/**
+		 * Databases configurations.
+		 * 
+		 * (@array) default - Default database configuration.
+		 *		(@string) driver - The database driver name.
+		 *		(@string) host - Database host.
+		 *		(@string) path - The database file path.
+		 *		(@string) user - Database user name;
+		 *		(@string) password - Database user password.
+		 *		(@string) encoding - The database encoding.
+		 */
 		->set('Databases', [
-			'Firebird' => [
-				'SRICASH' => [
-					'host' => 'localhost',
-					'path' => '/BD/SRICASH.FDB',
-					'user' => 'SYSDBA',
-					'password' => 'masterkey',
-					'encoding' => 'UTF8'
-				]
+			'default' => [
+				'driver' => 'driverName',
+				'host' => 'localhost',		 
+				'path' => '/example/file.fdb',  
+				'user' => 'root',
+				'password' => 'secret',
+				'encoding' => 'UTF8'
 			]
 		])
+
+		/**
+		 * Webservice configurations.
+		 *
+		 * (@string) url - The webservice URL.
+		 * (@array) configs - Webservice configurations. 
+		 */
 		->set('Webservice', [
-			'url' => "http://examplews.com/soap",
+			'url' => "http://examplews.com/soap", 
 			'configs' => [
 				'soap_version' => 'SOAP_1_2',
                 'exceptions' => true,

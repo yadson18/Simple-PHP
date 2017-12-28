@@ -1,3 +1,6 @@
+# SQL Script to create project classes (Table, Entity, Controller).
+#   Note: based on database table properties.
+
 WITH VALIDATOR_METHOD AS(
     SELECT DISTINCT LOWER(R.RDB$FIELD_NAME) AS COLUMNS, 
     

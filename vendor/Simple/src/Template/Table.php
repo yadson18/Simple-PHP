@@ -8,7 +8,7 @@
 	{
 		public function initialize()
 		{
-			$this->setDatabase('%db_type%', '%db_name%');
+			$this->setDatabase('%db_profile%');
 
 			$this->setTable('%table%');
 
@@ -17,7 +17,7 @@
 			$this->setBelongsTo('', []);
 		}
 
-		public function defaultValidator(Validator $validator)
+		protected function defaultValidator(Validator $validator)
 		{%table_attributes%
 
 			return $validator;

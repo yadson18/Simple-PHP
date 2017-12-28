@@ -1,6 +1,8 @@
 #!/bin/bash
 # yadson20@gmail.com
 #
+# Script to create project classes (Table, Entity, Controller).
+#	Note: File '.classCreator.sql' will be necessary.
 
 ROOT=$(pwd);
 
@@ -80,9 +82,8 @@ function makeClassTable(){
 	if [ $# -eq 5 ]; then
 		tableName=$1;
 		tableAttributes=$2;
-		databaseType=$3;
-		databaseName=$4;
-		primaryKeys=$5;
+		databaseProfile=$3;
+		primaryKeys=$4;
 		className=$(getClassName $tableName);
 
 		if [ $className != 0 ]; then 
@@ -90,7 +91,7 @@ function makeClassTable(){
 				primaryKeys="";
 			fi
 
-			table=$(sed -e "s/%table_name%/$className/g" -e "s/%table_attributes%/$tableAttributes/g" -e "s/%db_type%/$databaseType/g" -e "s/%db_name%/$databaseName/g" -e "s/%table%/$tableName/g" -e "s/%primary_key%/$primaryKeys/g" $TEMPLATES_PATH/Table.php > $MODEL_PATH/Table/$className'Table.php');
+			table=$(sed -e "s/%table_name%/$className/g" -e "s/%table_attributes%/$tableAttributes/g" -e "s/%db_profile%/$databaseProfile/g" -e "s/%table%/$tableName/g" -e "s/%primary_key%/$primaryKeys/g" $TEMPLATES_PATH/Table.php > $MODEL_PATH/Table/$className'Table.php');
 			
 			if [ $? -ne 1 ]; then
 				echo 1;
@@ -221,7 +222,7 @@ if [ $# -eq 3 ] && [ "$1" == mclasses ] && [ "$2" != "" ] && [ "$3" != "" ]; the
 			done
 			
 			ControllerClass=$(makeClassController $tableName);
-			TableClass=$(makeClassTable $tableName "$attributes" Firebird $databaseName $primaryKeys);
+			TableClass=$(makeClassTable $tableName "$attributes" $databaseName $primaryKeys);
 			EntityClass=$(makeClassEntity $tableName);
 			ViewDirectoryClass=$(makeViewDir $tableName);
 			className=$(getClassName $tableName);
