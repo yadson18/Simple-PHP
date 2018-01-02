@@ -17,6 +17,21 @@
 		}
 	}
 
+	function minutesTo(string $conversionType, int $minutes)
+	{
+		switch ($conversionType) {
+			case 'miliseconds':
+				return (60 * $minutes) * 60;
+				break;
+			case 'seconds':
+				return 60 * $minutes;
+				break;
+			case 'hours':
+				return $minutes / 60;
+				break;
+		}
+	}
+
 	function mergeSubArrays(array $array, int $start, int $end)
 	{
 		$result = [];
@@ -64,7 +79,7 @@
 		return str_replace($search, $replace, $value);
 	}
 
-	function find_array_values(string $keys, array $array)
+	function findArrayValues(string $keys, array $array)
 	{
 		return arrayDeepSearch(explode('.', $keys), $array);
 	}
@@ -84,7 +99,7 @@
 			'i' => ["í","ì"],
 			'o' => ["ó","ò","ô","õ","ö"],
 			'u' => ["ú","ù","ü"],
-			'ç' => ['c'],
+			'c' => ['ç'],
 			'' => [
 	    		"[","]",">","<","}","{",")","(",":",";",",","!","?","*","%","~","^","`","@"
 	    	]

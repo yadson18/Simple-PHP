@@ -1,73 +1,93 @@
 <?php 
-	namespace Simple\Session;
+	namespace Simple\Session;  
 	
 	class Session
 	{
+		private static $sessionConfigs;
+
 		public function __construct()
 		{
-			session_start(['cookie_lifetime' => 86400]);
+			$this->start();
 		}
 
-		protected function startSession()
+		public function setData(string $index, $data)
 		{
-			if (!isset($_SESSION['newSession'])) {
-				$_SESSION = [
-					'newSession' => [],
-					'logged' => true,
-					'created' => date('H:i')
-				];
+			$this->regenerateId();
+
+			if ($this->sessionCreated() && !empty($index)) {
+				$_SESSION['newSession']['data'][$index] = serialize($data);
 			}
 		}
 
-		protected function createNewId(int $minutes)
+		public function getData(string $index)
+		{
+			if ($this->sessionCreated() &&
+				isset($_SESSION['newSession']['data'][$index])
+			) {
+				return unserialize($_SESSION['newSession']['data'][$index]);
+			}
+		}
+
+		public function removeData(string $index)
+		{
+			if ($this->getData($index)) {
+				unset($_SESSION['newSession']['data'][$index]);
+			}
+		}
+
+		public function destroy()
+		{
+			if ($this->sessionCreated()) {
+				session_start();
+				session_destroy();
+			}
+		}
+
+		protected function sessionCreated()
 		{
 			if (isset($_SESSION['newSession'])) {
-				$time = 60 * $minutes;
-				
-				if ((strtotime(date('H:i')) - strtotime($_SESSION['created'])) >= $time) {
-					session_regenerate_id(); 
-					$_SESSION['created'] = date('H:i');
-				}
-			}
-		}
-
-		public function findData(string $index)
-		{
-			if (isset($_SESSION['newSession'][$index])) {
 				return true;
 			}
 			return false;
 		}
 
-		public function removeData(string $index)
+		protected function start()
 		{
-			if (isset($_SESSION['newSession'][$index])) {
-				unset($_SESSION['newSession'][$index]);
-			}
-			return false;
-		}
+			if (!$this->sessionCreated() &&
+				isset(static::$sessionConfigs['cookieLifeTime'])
+			) {
+				session_start([
+					'cookie_lifetime' => static::$sessionConfigs['cookieLifeTime'],
+					'read_and_close'  => true
+				]);
 
-		public function getData()
-		{
-			if (isset($_SESSION['newSession'])) {
-				return array_map('unserialize', $_SESSION['newSession']);
-			}
-		}
-
-		public function setData(string $index, $data)
-		{
-			$this->startSession();
-			$this->createNewId(5);
-
-			if (!empty($index) && !empty($data)) {
-				$_SESSION['newSession'][$index] = serialize($data);
+				$_SESSION = [
+					'newSession' => [
+						'data' => [],
+						'created' => date('H:i')
+					]
+				];
 			}
 		}
 
-		public function close()
+		protected function regenerateId()
 		{
-			if (isset($_SESSION['newSession'])) {
-				session_destroy();
+			if ($this->sessionCreated() &&
+				isset(static::$sessionConfigs['regenerateId'])
+			) {
+				$currentTime = strtotime(date('H:i'));
+				$sessionTimeCreated = strtotime($_SESSION['newSession']['created']);
+				$time = static::$sessionConfigs['regenerateId'];
+				
+				if (($currentTime - $sessionTimeCreated) >= $time) {
+					session_regenerate_id(); 
+					$_SESSION[]['created'] = date('H:i');
+				}
 			}
+		}
+
+		public static function configSession(array $configs)
+		{
+			static::$sessionConfigs = $configs;
 		}
 	}

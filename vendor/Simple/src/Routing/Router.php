@@ -79,6 +79,6 @@
 
 		public static function getRoute(string $routeName)
 		{
-			return find_array_values($routeName, static::$routes);
+			return findArrayValues($routeName, static::$routes);
 		}
 	}

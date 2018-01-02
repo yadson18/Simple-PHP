@@ -35,8 +35,10 @@
 	use Simple\Application\Application;
 	use Simple\View\Components\Html;
 	use Simple\Database\Driver; 
+	use Simple\Session\Session;
 
 	Application::configAppName($config->use('App.name'));
 	Webservice::configOptions($config->use('Webservice'));
 	Driver::configDrivers($config->use('Databases'));
 	Html::configEncode($config->use('App.encoding'));
+	Session::configSession($config->use('Session'));

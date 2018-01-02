@@ -23,6 +23,8 @@
 			$this->loadComponent('Ajax');
 
 			$this->loadComponent('Flash');
+
+			$this->loadComponent('Auth');
 		}	
 
 		/**

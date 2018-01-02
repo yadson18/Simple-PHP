@@ -73,6 +73,17 @@
 		])
 
 		/**
+		 * Session configurations.
+		 * 
+		 * (@int) cookieLifeTime - Session cookie duration.
+		 * (@int) regenerateId - Time to regenerate session id.
+		 */
+		->set('Session', [
+			'cookieLifeTime' => minutesTo('seconds', 1440),
+			'regenerateId' => minutesTo('seconds', 20)
+		])
+
+		/**
 		 * Webservice configurations.
 		 *
 		 * (@string) url - The webservice URL.

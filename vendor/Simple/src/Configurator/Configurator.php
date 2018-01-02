@@ -33,6 +33,6 @@
 
 		public function use(string $configName)
 		{
-			return find_array_values($configName, $this->appConfigs);
+			return findArrayValues($configName, $this->appConfigs);
 		}
 	}
