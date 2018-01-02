@@ -38,7 +38,7 @@
 		public function destroy()
 		{
 			if ($this->sessionCreated()) {
-				session_start();
+				$this->start();
 				session_destroy();
 			}
 		}
@@ -53,20 +53,19 @@
 
 		protected function start()
 		{
-			if (!$this->sessionCreated() &&
-				isset(static::$sessionConfigs['cookieLifeTime'])
-			) {
+			if (isset(static::$sessionConfigs['cookieLifeTime'])) {
 				session_start([
-					'cookie_lifetime' => static::$sessionConfigs['cookieLifeTime'],
-					'read_and_close'  => true
+					'cookie_lifetime' => static::$sessionConfigs['cookieLifeTime']
 				]);
-
-				$_SESSION = [
-					'newSession' => [
-						'data' => [],
-						'created' => date('H:i')
-					]
-				];
+				
+				if (!$this->sessionCreated()) {
+					$_SESSION = [
+						'newSession' => [
+							'data' => [],
+							'created' => date('H:i')
+						]
+					];
+				}
 			}
 		}
 
