@@ -113,7 +113,6 @@
 				require_once $this->getTemplatePath() . $this->getTemplate() . View::EXT;
 			}
 			
-			ob_end_flush();
 			return ob_get_clean();
 		}
 
@@ -125,7 +124,6 @@
 				require_once View::LAYOUT . $layout;
 			}
 
-			ob_end_flush();
 			return ob_get_clean();
 		}
 

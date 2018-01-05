@@ -117,7 +117,7 @@
 						return $this->select(['*'])
 							->from($tables)
 							->where($condition)
-							->fetch('all');
+							->fetch('class');
 					}
 					return $this->find(['*'])
 						->where([$this->getPrimaryKey() . ' = ' => $key])
