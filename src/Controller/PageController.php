@@ -11,7 +11,5 @@
 		public function home()
 		{ 
 			$this->setTitle('Welcome!');
-
-			$this->Auth->setUser($this->Page->newEntity());	
 		}
 	}
