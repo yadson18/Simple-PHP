@@ -7,6 +7,8 @@
 	{
 		public function __construct()
 		{
+			parent::__construct();
+			
 			$this->initialize([
 				'login' => [
 					'controller' => 'Page', 
