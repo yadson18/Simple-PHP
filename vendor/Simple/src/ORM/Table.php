@@ -40,7 +40,7 @@
 
 		protected function getEntityName()
 		{
-			$entityName = replace(splitNamespace(get_class($this)), 'Table', '');
+			$entityName = str_replace('Table', '', splitNamespace(get_class($this)));
 
 			return Table::ENTITY_NAMESPACE . $entityName;
 		}
@@ -89,39 +89,41 @@
 
 		public function get($key, array $contain = [])
 		{
-			if (!empty($key) && !empty($this->getTable())) {
-				if ($key === 'all') {
-					return $this->find(['*'])
+			if (is_numeric($key) && $key >= 0 || !empty($key)) {
+				if (!empty($this->getTable())) {
+					if ($key === 'all') {
+						return $this->find(['*'])
 							->fetch('all');
-				}
-				else if (!empty($this->getPrimaryKey())) {
-					if (isset($contain['contain']) && !empty($contain['contain'])) {
-						$condition = [
-							$this->getTable() . '.' . $this->getPrimaryKey() . ' = ' => $key
-						];
-						$tables = [$this->getTable()];
-						
-						foreach ($contain['contain'] as $table) {
-							$belongs = $this->getBelongsTo($table);
+					}
+					else if (!empty($this->getPrimaryKey())) {
+						if (isset($contain['contain']) && !empty($contain['contain'])) {
+							$condition = [
+								$this->getTable() . '.' . $this->getPrimaryKey() . ' = ' => $key
+							];
+							$tables = [$this->getTable()];
+							
+							foreach ($contain['contain'] as $table) {
+								$belongs = $this->getBelongsTo($table);
 
-							if (!empty($belongs) && isset($belongs['key']) &&
-								isset($belongs['foreignKey'])
-							) {
-								$tables[] = $table;
-								$condition[] = 'and ' . 
-									$this->getTable() . '.' . $belongs['key'] . ' = ' . 
-									$table . '.' . $belongs['foreignKey'];
+								if (!empty($belongs) && isset($belongs['key']) &&
+									isset($belongs['foreignKey'])
+								) {
+									$tables[] = $table;
+									$condition[] = 'and ' . 
+										$this->getTable() . '.' . $belongs['key'] . ' = ' . 
+										$table . '.' . $belongs['foreignKey'];
 
+								}
 							}
+							return $this->select(['*'])
+								->from($tables)
+								->where($condition)
+								->fetch('class');
 						}
-						return $this->select(['*'])
-							->from($tables)
-							->where($condition)
+						return $this->find(['*'])
+							->where([$this->getPrimaryKey() . ' = ' => $key])
 							->fetch('class');
 					}
-					return $this->find(['*'])
-						->where([$this->getPrimaryKey() . ' = ' => $key])
-						->fetch('class');
 				}
 			}
 			return false;
@@ -133,19 +135,19 @@
 				$primaryKey = $this->getPrimaryKey();
 
 				if (isset($entity->$primaryKey)) {
-					if (!$this->get($entity->$primaryKey)) {
-						return $this->insert($this->getTable())
-							->values((array) $entity)
+					if ($this->get($entity->$primaryKey)) {
+						$primaryKeyValue = $entity->$primaryKey;
+						unset($entity->$primaryKey);
+
+						return $this->update($this->getTable())
+							->set((array) $entity)
+							->where([$primaryKey . ' = ' => $primaryKeyValue])
 							->fetch('rowCount');
 					}
-					$primaryKeyValue = $entity->$primaryKey;
-					unset($entity->$primaryKey);
-
-					return $this->update($this->getTable())
-						->set((array) $entity)
-						->where([$primaryKey . ' = ' => $primaryKeyValue])
-						->fetch('rowCount');
 				}
+				return $this->insert($this->getTable())
+					->values((array) $entity)
+					->fetch('rowCount');
 			}
 			return false;
 		}

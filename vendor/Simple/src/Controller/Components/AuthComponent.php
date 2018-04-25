@@ -21,8 +21,8 @@
 			]);
 		}
 
-		public function isAuthorized()
+		public function isAuthorized(array $methods)
 		{
-			return $this->allow([]);
+			$this->allow($methods);
 		}
 	}

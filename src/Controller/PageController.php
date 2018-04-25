@@ -9,7 +9,12 @@
 		}
 
 		public function home()
-		{ 
+		{
 			$this->setTitle('Welcome!');
+		}
+
+		public function beforeFilter()
+		{
+			$this->Auth->isAuthorized([]);
 		}
 	}

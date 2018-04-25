@@ -1,4 +1,4 @@
-<?php 
+<?php
 	function removeNamespace($object)
 	{
 		return splitNamespace(get_class($object));
@@ -15,6 +15,27 @@
 					: arrayDeepSearch($keys, $array[$key]);
 			}
 		}
+	}
+
+	function mask(string $mask, string $value)
+	{
+		$mask = str_split($mask);
+		$value = str_split($value);
+
+		foreach ($mask as $index => $char) {
+			if ($char === '#' && !empty($value)) {
+				$mask[$index] = array_shift($value);
+			}
+		}
+		return implode($mask);
+	}
+
+	function unmask(string $value)
+	{
+		return str_replace([
+	    	'[',']','>','<','}','{',')','(',':',';','/',
+	    	',','!','?','*','%','~','^','`','@','-','\\','.'
+	    ], '', $value);
 	}
 
 	function minutesTo(string $conversionType, int $minutes)
@@ -44,7 +65,6 @@
 				}
 			}
 		}
-
 		return $result;
 	}
 
@@ -59,24 +79,9 @@
 
 		if (is_array($pieces)) {
 			$result = array_pop($pieces);
-
 			return (!empty($result)) ? $result : array_pop($pieces);
 		}
 		return $pieces;
-	}
-
-	function replaceRecursive(string $value, array $replaces)
-	{
-		while ($replaces) {
-			$value = replace($value, key($replaces), array_shift($replaces));
-		}
-
-		return $value;
-	}
-
-	function replace(string $value, string $search, string $replace)
-	{
-		return str_replace($search, $replace, $value);
 	}
 
 	function findArrayValues(string $keys, array $array)
@@ -86,22 +91,28 @@
 
 	function debug($data)
 	{
-		echo "<pre id='debug-screen'>";
+		echo '<pre id="debug-screen">';
 		var_dump($data);
-		echo "</pre>";
+		echo '</pre>';
+	}
+
+	function sanitize($data)
+	{
+		return removeSpecialChars(unmask($data));
 	}
 
 	function removeSpecialChars(string $value) 
 	{
 		$invalid = [
-			'a' => ["á","à","â","ã","ä"],
-			'e' => ["é","è","ê"],
-			'i' => ["í","ì"],
-			'o' => ["ó","ò","ô","õ","ö"],
-			'u' => ["ú","ù","ü"],
+			'a' => ['á','à','â','ã','ä'],
+			'e' => ['é','è','ê'],
+			'i' => ['í','ì'],
+			'o' => ['ó','ò','ô','õ','ö'],
+			'u' => ['ú','ù','ü'],
 			'c' => ['ç'],
 			'' => [
-	    		"[","]",">","<","}","{",")","(",":",";",",","!","?","*","%","~","^","`","@"
+	    		'[',']','>','<','}','{',';','#',
+	    		'!','?','*','%','~','^','`','@'
 	    	]
 		];
 
@@ -111,6 +122,5 @@
 				array_map('mb_strtoupper', $invalidValues), strtoupper($replaceTo), $value
 			);
 		}
-		
 		return $value;
 	}

@@ -4,6 +4,7 @@
 	 */
 
 	require_once 'routes.php';
+	require_once APP . 'functions.php';
 
 	use Simple\Configurator\Configurator;
 
@@ -23,7 +24,7 @@
 		 *		(false) Errors or warnings turn off.
 		 */
 		->set('App', [
-			'name' => 'Simple - ', 	 
+			'name' => 'SRI Emissor', 	 
 			'encoding' => 'utf-8',	 
 			'timezone' => 'UTC',	 
 			'locate' => 'pt-Br',		 
@@ -62,13 +63,21 @@
 		 *		(@string) encoding - The database encoding.
 		 */
 		->set('Databases', [
-			'default' => [
-				'driver' => 'driverName',
+			'SRICASH' => [
+				'driver' => 'Firebird',
 				'host' => 'localhost',		 
-				'path' => '/example/file.fdb',  
-				'user' => 'root',
-				'password' => 'secret',
-				'encoding' => 'UTF8'
+				'path' => '/var/SRI/DADOSVR/SRICASH.FDB',  
+				'user' => 'SYSDBA',
+				'password' => 'masterkey',
+				'encoding' => 'utf-8'
+			],
+			'SRICASH2' => [
+				'driver' => 'Firebird',
+				'host' => 'localhost',		 
+				'path' => '/var/SRI/DADOSVR/SRICASH2.FDB',  
+				'user' => 'SYSDBA',
+				'password' => 'masterkey',
+				'encoding' => 'utf-8'
 			]
 		])
 

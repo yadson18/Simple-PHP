@@ -84,15 +84,21 @@
 				if (isset($rule['null']) && isset($rule['type']) && 
 					isset($rule['size'])
 				) {
-					if (!empty($value) && $rule['null'] === true || 
-						!empty($value) && $rule['null'] === false ||
-						empty($value) && $rule['null'] === true 
-					) {
-						if (!empty($value) && settype($value, $rule['type'])) {
+					/*debug(
+						'Coluna: ' . $ruleName .
+						' / Valor: ' . $value .
+						' / Tamanho: ' . strlen((string) $value) .
+						' / Tamanho esperado: ' . $rule['size']
+					);*/
+					if (is_numeric($value) || !empty($value)) {
+						if (settype($value, $rule['type'])) {
 							if (strlen((string) $value) <= $rule['size']) {
 								return true;
 							}
-						}	
+						}
+					}
+					else if ($rule['null'] === true) {
+						return true;
 					}
 				}
 			}

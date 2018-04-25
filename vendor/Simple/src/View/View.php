@@ -1,6 +1,7 @@
 <?php 
 	namespace Simple\View;
 
+	use Simple\Application\Application;
 	use Simple\View\Components\Html;
 	use Simple\View\Components\Form;
 
@@ -23,6 +24,8 @@
 		private $controllerName;
 
 		private $template;
+
+		private $content;
 
 		private $title;
 
@@ -47,19 +50,17 @@
 				case 'title': 
 					return $this->getTitle(); 
 				break;
-				case 'controllerName': 
+				case 'controller': 
 					return $this->getControllerName(); 
 				break;
-				case 'viewName': 
+				case 'view': 
 					return $this->getTemplate(); 
 				break;
 				case 'appName': 
-					return \Simple\Application\Application::getAppName(); 
+					return Application::getAppName(); 
 				break;
 				case 'content': 
-					return $this->getTemplateContent(
-						$this->getTemplatePath() . $this->getTemplate() . View::EXT
-					);
+					return $this->getContent();
 				break;
 			}
 		}
@@ -74,35 +75,39 @@
 			return $this->contentType;
 		}
 
-		public function setTemplatePath(string $templatePath){
+		public function setTemplatePath(string $templatePath)
+		{
 			$this->templatePath = $templatePath;
 		}
 
-		protected function getTemplatePath(){
+		protected function getTemplatePath()
+		{
 			return $this->templatePath;
 		}
 
-		public function setTemplate(string $template){
+		public function setTemplate(string $template)
+		{
 			$this->template = $template;
 		}
 
-		protected function getTemplate(){
+		protected function getTemplate()
+		{
 			return $this->template;
 		}
 
-		protected function canBeRender(string $file)
+		protected function getContent()
 		{
-			if (file_exists($file)) {
-				return true;
-			}
-			return false;
+			return $this->content;
 		}
 
-		protected function getTemplateContent()
+		protected function setContent(string $content)
 		{
-			ob_start();
-			
-			if ($this->canBeRender($this->getTemplatePath() . $this->getTemplate() . View::EXT)) {
+			$this->content = $content;
+		}
+
+		protected function renderContent(string $layout)
+		{
+			if (file_exists(View::LAYOUT . $layout)) {
 				if (!empty($this->getViewVars())) {
 					foreach ($this->getViewVars() as $variable => $value) {
 						if (is_string($variable)) {
@@ -110,35 +115,34 @@
 						}
 					}
 				}
-				require_once $this->getTemplatePath() . $this->getTemplate() . View::EXT;
-			}
-			
-			return ob_get_clean();
-		}
 
-		protected function getLayoutContent(string $layout)
-		{
-			ob_start();
+				ob_start();
+				
+				if (file_exists(
+					$this->getTemplatePath() . $this->getTemplate() . View::EXT)
+				) {
+					require_once $this->getTemplatePath() . $this->getTemplate() . View::EXT;
+				}
 
-			if ($this->canBeRender(View::LAYOUT . $layout)) {
+				$this->setContent(ob_get_clean());
+
 				require_once View::LAYOUT . $layout;
 			}
-
-			return ob_get_clean();
 		}
 
 		public function render()
 		{
 			switch ($this->getContentType()) {
 				case 'ajax':
-					echo $this->getLayoutContent(View::AJAX);
-				break;
+					echo $this->renderContent(View::AJAX);
+					break;
 				case 'default':
-					echo $this->getLayoutContent(View::DEFAULT);
-				break;
+					echo $this->renderContent(View::DEFAULT);
+
+					break;
 				default:
-					echo $this->getLayoutContent(View::ERROR);
-				break;
+					echo $this->renderContent(View::ERROR);
+					break;
 			}
 		}
 
@@ -157,19 +161,21 @@
 
 		public function setViewVars(array $viewVars)
 		{
-			$this->viewVars = $viewVars;
+			$this->viewVars = serialize($viewVars);
 		}
 
 		protected function getViewVars()
 		{
-			return $this->viewVars;
+			return unserialize($this->viewVars);
 		}
 
-		public function setControllerName(string $controller){
+		public function setControllerName(string $controller)
+		{
 			$this->controllerName = $controller;
 		}
 
-		protected function getControllerName(){
+		protected function getControllerName()
+		{
 			return $this->controllerName;
 		}
 	}

@@ -5,7 +5,7 @@
 
 	class Firebird extends PDODriver
 	{
-		private static $dsn = 'firebird:dbname=%host%:%path%; charset=%encode%';
+		private static $dsn = 'firebird:dbname=%host%:%path%;charset=%encode%';
 
 		public function __construct(array $configs)
 		{
@@ -15,11 +15,14 @@
 		protected function mountPdoConfig(array $configs)
 		{
 			return [
-				'dsn' => replaceRecursive(static::$dsn, [
-					'%host%' => $configs['host'],
-					'%path%' => $configs['path'],
-					'%encode%' => $configs['encoding']
-				]),
+				'dsn' => preg_replace(
+					['/%host%/', '/%path%/', '/%encode%/'], [
+						$configs['host'], 
+						$configs['path'], 
+						$configs['encoding']
+					], 
+					static::$dsn
+				),
 				'user' => $configs['user'],
 				'password' => $configs['password']
 			];

@@ -66,52 +66,52 @@
 			if (!empty($header) && isset($header->controller)) {
 				$controller = new Builder('App\\Controller\\' . $header->controller . 'Controller');
 				$templatePath = TEMPLATE . $header->controller . DS;
+				if ($controller->canInvokeMethod('isAuthorized') &&
+					$controller->canInvokeMethod('initialize') &&
+					$controller->canInvokeMethod($header->view)
+				) {
+					$controller->invoke('initialize', [$this->getRequest(), $view]);
+				
+					if ($controller->canInvokeMethod('beforeFilter')) {
+						$controller->invoke('beforeFilter');
+					}
+					if ($controller->invoke('isAuthorized')) {
+						$result = $controller->invoke($header->view, $header->args);
 
-				if (is_file($templatePath . $header->view . '.php')) {
-					if ($controller->canInvokeMethod('isAuthorized') &&
-						$controller->canInvokeMethod('initialize') &&
-						$controller->canInvokeMethod($header->view)
-					) {
-						$controller->invoke('initialize', [$this->getRequest(), $view]);
-						
-						if ($controller->invoke('isAuthorized')) {
-							$result = $controller->invoke($header->view, $header->args);
-
-							if (isset($result['redirect'])) {
-								Router::location($result['redirect']);
+						if (isset($result['redirect'])) {
+							Router::location($result['redirect']);
+						}
+						else if(is_file($templatePath . $header->view . '.php')){
+							if ($controller->canUseAttribute('Ajax') &&
+								call_user_func([
+									$controller->useAttribute('Ajax'), 'notEmptyResponse'
+								])
+							) {
+								$view->setContentType('ajax');
+								$view->setViewVars(call_user_func([
+									$controller->useAttribute('Ajax'), 'getResponse'
+								]));
 							}
 							else {
-								if ($controller->canUseAttribute('Ajax') &&
-									call_user_func([
-										$controller->useAttribute('Ajax'), 'notEmptyResponse'
-									])
-								) {
-									$view->setContentType('ajax');
-									$view->setViewVars(call_user_func([
-										$controller->useAttribute('Ajax'), 'getResponse'
-									]));
-								}
-								else {
-									$view->setContentType('default');
-								}
-
-								$view->setComponents($controller->invoke('getComponents'));
-								$view->setControllerName($header->controller);
-								$view->setTemplatePath($templatePath);
-								$view->setTemplate($header->view);	
-								$this->setCode(200);
+								$view->setContentType('default');
 							}
+
+							$view->setComponents($controller->invoke('getComponents'));
+							$view->setControllerName($header->controller);
+							$view->setTemplatePath($templatePath);
+							$view->setTemplate($header->view);	
+							$this->setCode(200);
 						}
 						else {
-							$this->setCode(401);
+							$this->setCode(404);
 						}
 					}
 					else {
-						$this->setCode(400);
+						$this->setCode(401);
 					}
 				}
 				else {
-					$this->setCode(404);
+					$this->setCode(400);
 				}
 			}
 			else {

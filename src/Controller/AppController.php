@@ -5,6 +5,9 @@
 	use Simple\Http\Request;
 	use Simple\View\View;
 
+
+	use Simple\Configurator\Configurator;
+
 	abstract class AppController extends Controller
 	{
 		/**
@@ -23,6 +26,8 @@
 			$this->loadComponent('Ajax');
 
 			$this->loadComponent('Flash');
+
+			$this->loadComponent('Paginator');
 
 			$this->loadComponent('Auth');
 		}	
@@ -45,11 +50,13 @@
             }
             else if (is_callable([$this->Auth, 'getUser']) &&
             	!empty(call_user_func([$this->Auth, 'getUser'])) &&
-            	is_callable([$this->Auth, 'isAuthorized']) &&
-            	in_array($view, call_user_func([$this->Auth, 'isAuthorized']))
+            	is_callable([$this->Auth, 'checkAuthorization']) &&
+            	call_user_func_array([$this->Auth, 'checkAuthorization'], [$view])
         	) {
             	return true;
             }
             return false;
         }
+		
+		public abstract function beforeFilter();
 	}

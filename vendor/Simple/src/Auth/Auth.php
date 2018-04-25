@@ -6,6 +6,7 @@
 
 	abstract class Auth {
 		private $session;
+		private $authorizedMethods;
 
 		public function __construct()
 		{
@@ -29,12 +30,13 @@
 
 		public function getUser(string $index = null)
 		{
-			if (empty($index)) {
-				return $this->session->getData('Auth');
+			if (!empty($index)) {
+				if (isset($this->session->getData('Auth')->$index)) {
+					return $this->session->getData('Auth')->$index;
+				}
+				return false;
 			}
-			else if (isset($this->session->getData('Auth')->$index)) {
-				return $this->session->getData('Auth')->$index;
-			}
+			return $this->session->getData('Auth');
 		}
 
 		public function loginRedirect()
@@ -58,6 +60,14 @@
 
 		protected function allow(array $methods = [])
 		{
-			return $methods;
+			$this->authorizedMethods = $methods;
+		}
+
+		public function checkAuthorization(string $method)
+		{
+			if (in_array($method, $this->authorizedMethods)) {
+				return true;
+			}
+			return false;
 		}
 	}
